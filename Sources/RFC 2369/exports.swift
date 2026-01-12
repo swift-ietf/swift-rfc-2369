@@ -17,5 +17,5 @@
 /// - INCITS 4-1986 (ASCII byte constants)
 /// - RFC 3987 (IRI types)
 
-@_exported public import INCITS_4_1986
+@_exported public import ASCII
 @_exported public import RFC_3987

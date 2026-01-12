@@ -11,7 +11,7 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import INCITS_4_1986
+public import ASCII
 
 extension RFC_2369.List {
     /// Complete set of list management headers as defined in RFC 2369

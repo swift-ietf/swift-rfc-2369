@@ -17,14 +17,14 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(path: "../swift-incits-4-1986"),
+        .package(path: "../../swift-foundations/swift-ascii"),
         .package(path: "../swift-rfc-3987"),
     ],
     targets: [
         .target(
             name: "RFC 2369",
             dependencies: [
-                .product(name: "INCITS 4 1986", package: "swift-incits-4-1986"),
+                .product(name: "ASCII", package: "swift-ascii"),
                 .product(name: "RFC 3987", package: "swift-rfc-3987"),
             ]
         ),
