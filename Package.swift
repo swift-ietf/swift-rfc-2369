@@ -17,8 +17,8 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/swift-foundations/swift-ascii.git", from: "0.0.1"),
-        .package(url: "https://github.com/swift-standards/swift-rfc-3987.git", from: "0.0.1"),
+        .package(path: "../../swift-foundations/swift-ascii"),
+        .package(path: "../swift-rfc-3987"),
     ],
     targets: [
         .target(
