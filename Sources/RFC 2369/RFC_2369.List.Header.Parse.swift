@@ -30,7 +30,6 @@ extension RFC_2369.List.Header.Parse {
 }
 
 extension RFC_2369.List.Header.Parse: Parser.`Protocol` {
-    public typealias ParseOutput = Output
     public typealias Failure = RFC_2369.List.Header.Parse<Input>.Error
 
     @inlinable
