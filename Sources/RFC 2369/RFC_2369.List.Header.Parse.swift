@@ -1,5 +1,5 @@
 //
-//  RFC_2369.Parse.ListHeader.swift
+//  RFC_2369.List.Header.Parse.swift
 //  swift-rfc-2369
 //
 //  RFC 2369 list header: comma-separated angle-bracketed URIs
@@ -7,20 +7,20 @@
 
 public import Parser_Primitives
 
-extension RFC_2369.Parse {
+extension RFC_2369.List.Header {
     /// Parses an RFC 2369 list header value.
     ///
     /// `list-header = "<" URI ">" *("," "<" URI ">")`
     ///
     /// Returns the raw URI byte slices (without angle brackets).
-    public struct ListHeader<Input: Collection.Slice.`Protocol`>: Sendable
+    public struct Parse<Input: Collection.Slice.`Protocol`>: Sendable
     where Input: Sendable, Input.Element == UInt8 {
         @inlinable
         public init() {}
     }
 }
 
-extension RFC_2369.Parse.ListHeader {
+extension RFC_2369.List.Header.Parse {
     public typealias Output = [Input]
 
     public enum Error: Swift.Error, Sendable, Equatable {
@@ -29,9 +29,9 @@ extension RFC_2369.Parse.ListHeader {
     }
 }
 
-extension RFC_2369.Parse.ListHeader: Parser.`Protocol` {
+extension RFC_2369.List.Header.Parse: Parser.`Protocol` {
     public typealias ParseOutput = Output
-    public typealias Failure = RFC_2369.Parse.ListHeader<Input>.Error
+    public typealias Failure = RFC_2369.List.Header.Parse<Input>.Error
 
     @inlinable
     public func parse(_ input: inout Input) throws(Failure) -> Output {
