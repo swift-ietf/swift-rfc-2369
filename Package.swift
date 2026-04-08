@@ -17,7 +17,7 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(path: "../../swift-foundations/swift-ascii"),
+        .package(path: "../../swift-primitives/swift-ascii-serializer-primitives"),
         .package(path: "../swift-rfc-3987"),
         .package(path: "../../swift-primitives/swift-parser-primitives")
     ],
@@ -25,7 +25,7 @@ let package = Package(
         .target(
             name: "RFC 2369",
             dependencies: [
-                .product(name: "ASCII", package: "swift-ascii"),
+                .product(name: "ASCII Serializer Primitives", package: "swift-ascii-serializer-primitives"),
                 .product(name: "RFC 3987", package: "swift-rfc-3987"),
                 .product(name: "Parser Primitives", package: "swift-parser-primitives")
             ]

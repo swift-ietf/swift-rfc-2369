@@ -11,7 +11,7 @@
 //
 // ===----------------------------------------------------------------------===//
 
-public import ASCII
+public import ASCII_Serializer_Primitives
 
 extension RFC_2369.List {
     /// Complete set of list management headers as defined in RFC 2369
