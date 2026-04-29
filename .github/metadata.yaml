@@ -1,0 +1,10 @@
+# .github/metadata.yaml
+# Triaged by AI-assisted bulk pass (2026-04-29).
+description: "Swift implementation of RFC 2369: The Use of URLs as Meta-Syntax for Core Mail List Commands."
+topics:
+  - standards
+  - rfc
+  - rfc-2369
+  - email
+  - list-management
+homepage: "https://swift-institute.org"
