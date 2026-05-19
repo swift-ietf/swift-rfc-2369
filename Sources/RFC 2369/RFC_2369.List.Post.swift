@@ -73,20 +73,21 @@ extension RFC_2369.List.Post: Binary.ASCII.Serializable {
     static public func serialize<Buffer>(
         ascii post: RFC_2369.List.Post,
         into buffer: inout Buffer
-    ) where Buffer: RangeReplaceableCollection, Buffer.Element == UInt8 {
+    ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {
         switch post {
         case .noPosting:
-            buffer.append(contentsOf: [.ascii.N, .ascii.O])
+            buffer.append(ASCII.Code.N)
+            buffer.append(ASCII.Code.O)
 
         case .uris(let iris):
             for (index, iri) in iris.enumerated() {
                 if index > 0 {
-                    buffer.append(.ascii.comma)
-                    buffer.append(.ascii.space)
+                    buffer.append(ASCII.Code.comma)
+                    buffer.append(ASCII.Code.space)
                 }
-                buffer.append(.ascii.lessThanSign)
+                buffer.append(ASCII.Code.lessThanSign)
                 buffer.append(ascii: iri)
-                buffer.append(.ascii.greaterThanSign)
+                buffer.append(ASCII.Code.greaterThanSign)
             }
         }
     }
@@ -118,37 +119,39 @@ extension RFC_2369.List.Post: Binary.ASCII.Serializable {
     /// - Parameter bytes: The post value as ASCII bytes
     /// - Throws: `Error` if parsing fails
     public init<Bytes: Collection>(ascii bytes: Bytes, in context: Void = ()) throws(Error)
-    where Bytes.Element == UInt8 {
+    where Bytes.Element == Byte {
         var byteArray = Array(bytes)
 
         // Strip leading/trailing whitespace
         while !byteArray.isEmpty
-            && (byteArray.first == .ascii.space || byteArray.first == .ascii.htab) {
+            && (byteArray.first == ASCII.Code.space || byteArray.first == ASCII.Code.htab) {
             byteArray.removeFirst()
         }
         while !byteArray.isEmpty
-            && (byteArray.last == .ascii.space || byteArray.last == .ascii.htab) {
+            && (byteArray.last == ASCII.Code.space || byteArray.last == ASCII.Code.htab) {
             byteArray.removeLast()
         }
 
         guard !byteArray.isEmpty else { throw Error.empty }
 
         // Check for "NO" (case-insensitive)
-        if Array(bytes) == [UInt8.ascii.N, .ascii.O] {
+        if byteArray.count == 2
+            && byteArray[0] == ASCII.Code.N
+            && byteArray[1] == ASCII.Code.O {
             self = .noPosting
             return
         }
 
         // Parse angle-bracketed, comma-separated IRIs
         var iris: [RFC_3987.IRI] = []
-        var current: [UInt8] = []
+        var current: [Byte] = []
         var inBrackets = false
 
         for byte in byteArray {
-            if byte == .ascii.lessThanSign {
+            if byte == ASCII.Code.lessThanSign {
                 inBrackets = true
                 current = []
-            } else if byte == .ascii.greaterThanSign {
+            } else if byte == ASCII.Code.greaterThanSign {
                 inBrackets = false
                 if !current.isEmpty {
                     let iriString = String(decoding: current, as: UTF8.self)

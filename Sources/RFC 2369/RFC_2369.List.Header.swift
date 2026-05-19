@@ -98,97 +98,97 @@ extension RFC_2369.List {
 // MARK: - Binary.ASCII.Serializable
 
 extension RFC_2369.List.Header: Binary.ASCII.Serializable {
-    //    public static func serialize: @Sendable (Self) -> [UInt8] = [UInt8].init
+    //    public static func serialize: @Sendable (Self) -> [Byte] = [Byte].init
     static public func serialize<Buffer>(
         ascii header: RFC_2369.List.Header,
         into buffer: inout Buffer
-    ) where Buffer: RangeReplaceableCollection, Buffer.Element == UInt8 {
+    ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {
         // List-Help
         if let help = header.help {
-            buffer.append(contentsOf: "List-Help".utf8)
-            buffer.append(.ascii.colon)
-            buffer.append(.ascii.space)
-            buffer.append(.ascii.lessThanSign)
-            buffer.append(contentsOf: help.value.utf8)
-            buffer.append(.ascii.greaterThanSign)
-            buffer.append(.ascii.cr)
-            buffer.append(.ascii.lf)
+            buffer.append(contentsOf: Array<Byte>("List-Help".utf8))
+            buffer.append(ASCII.Code.colon)
+            buffer.append(ASCII.Code.space)
+            buffer.append(ASCII.Code.lessThanSign)
+            buffer.append(contentsOf: Array<Byte>(help.value.utf8))
+            buffer.append(ASCII.Code.greaterThanSign)
+            buffer.append(ASCII.Code.cr)
+            buffer.append(ASCII.Code.lf)
         }
 
         // List-Unsubscribe
         if let unsubscribe = header.unsubscribe, !unsubscribe.isEmpty {
-            buffer.append(contentsOf: "List-Unsubscribe".utf8)
-            buffer.append(.ascii.colon)
-            buffer.append(.ascii.space)
+            buffer.append(contentsOf: Array<Byte>("List-Unsubscribe".utf8))
+            buffer.append(ASCII.Code.colon)
+            buffer.append(ASCII.Code.space)
             for (index, iri) in unsubscribe.enumerated() {
                 if index > 0 {
-                    buffer.append(.ascii.comma)
-                    buffer.append(.ascii.space)
+                    buffer.append(ASCII.Code.comma)
+                    buffer.append(ASCII.Code.space)
                 }
-                buffer.append(.ascii.lessThanSign)
-                buffer.append(contentsOf: iri.value.utf8)
-                buffer.append(.ascii.greaterThanSign)
+                buffer.append(ASCII.Code.lessThanSign)
+                buffer.append(contentsOf: Array<Byte>(iri.value.utf8))
+                buffer.append(ASCII.Code.greaterThanSign)
             }
-            buffer.append(.ascii.cr)
-            buffer.append(.ascii.lf)
+            buffer.append(ASCII.Code.cr)
+            buffer.append(ASCII.Code.lf)
         }
 
         // List-Subscribe
         if let subscribe = header.subscribe, !subscribe.isEmpty {
-            buffer.append(contentsOf: "List-Subscribe".utf8)
-            buffer.append(.ascii.colon)
-            buffer.append(.ascii.space)
+            buffer.append(contentsOf: Array<Byte>("List-Subscribe".utf8))
+            buffer.append(ASCII.Code.colon)
+            buffer.append(ASCII.Code.space)
             for (index, iri) in subscribe.enumerated() {
                 if index > 0 {
-                    buffer.append(.ascii.comma)
-                    buffer.append(.ascii.space)
+                    buffer.append(ASCII.Code.comma)
+                    buffer.append(ASCII.Code.space)
                 }
-                buffer.append(.ascii.lessThanSign)
-                buffer.append(contentsOf: iri.value.utf8)
-                buffer.append(.ascii.greaterThanSign)
+                buffer.append(ASCII.Code.lessThanSign)
+                buffer.append(contentsOf: Array<Byte>(iri.value.utf8))
+                buffer.append(ASCII.Code.greaterThanSign)
             }
-            buffer.append(.ascii.cr)
-            buffer.append(.ascii.lf)
+            buffer.append(ASCII.Code.cr)
+            buffer.append(ASCII.Code.lf)
         }
 
         // List-Post
         if let post = header.post {
-            buffer.append(contentsOf: "List-Post".utf8)
-            buffer.append(.ascii.colon)
-            buffer.append(.ascii.space)
-            buffer.append(contentsOf: [UInt8](post))
-            buffer.append(.ascii.cr)
-            buffer.append(.ascii.lf)
+            buffer.append(contentsOf: Array<Byte>("List-Post".utf8))
+            buffer.append(ASCII.Code.colon)
+            buffer.append(ASCII.Code.space)
+            buffer.append(contentsOf: Array<Byte>(post))
+            buffer.append(ASCII.Code.cr)
+            buffer.append(ASCII.Code.lf)
         }
 
         // List-Owner
         if let owner = header.owner, !owner.isEmpty {
-            buffer.append(contentsOf: "List-Owner".utf8)
-            buffer.append(.ascii.colon)
-            buffer.append(.ascii.space)
+            buffer.append(contentsOf: Array<Byte>("List-Owner".utf8))
+            buffer.append(ASCII.Code.colon)
+            buffer.append(ASCII.Code.space)
             for (index, iri) in owner.enumerated() {
                 if index > 0 {
-                    buffer.append(.ascii.comma)
-                    buffer.append(.ascii.space)
+                    buffer.append(ASCII.Code.comma)
+                    buffer.append(ASCII.Code.space)
                 }
-                buffer.append(.ascii.lessThanSign)
-                buffer.append(contentsOf: iri.value.utf8)
-                buffer.append(.ascii.greaterThanSign)
+                buffer.append(ASCII.Code.lessThanSign)
+                buffer.append(contentsOf: Array<Byte>(iri.value.utf8))
+                buffer.append(ASCII.Code.greaterThanSign)
             }
-            buffer.append(.ascii.cr)
-            buffer.append(.ascii.lf)
+            buffer.append(ASCII.Code.cr)
+            buffer.append(ASCII.Code.lf)
         }
 
         // List-Archive
         if let archive = header.archive {
-            buffer.append(contentsOf: "List-Archive".utf8)
-            buffer.append(.ascii.colon)
-            buffer.append(.ascii.space)
-            buffer.append(.ascii.lessThanSign)
-            buffer.append(contentsOf: archive.value.utf8)
-            buffer.append(.ascii.greaterThanSign)
-            buffer.append(.ascii.cr)
-            buffer.append(.ascii.lf)
+            buffer.append(contentsOf: Array<Byte>("List-Archive".utf8))
+            buffer.append(ASCII.Code.colon)
+            buffer.append(ASCII.Code.space)
+            buffer.append(ASCII.Code.lessThanSign)
+            buffer.append(contentsOf: Array<Byte>(archive.value.utf8))
+            buffer.append(ASCII.Code.greaterThanSign)
+            buffer.append(ASCII.Code.cr)
+            buffer.append(ASCII.Code.lf)
         }
     }
 
@@ -208,32 +208,32 @@ extension RFC_2369.List.Header: Binary.ASCII.Serializable {
     /// - Parameter bytes: The header as ASCII bytes
     /// - Throws: `Error` if parsing fails
     public init<Bytes: Collection>(ascii bytes: Bytes, in context: Void = ()) throws(Error)
-    where Bytes.Element == UInt8 {
+    where Bytes.Element == Byte {
         let byteArray = Array(bytes)
 
         // Helper to trim whitespace
-        func trimWhitespace(_ arr: [UInt8]) -> [UInt8] {
+        func trimWhitespace(_ arr: [Byte]) -> [Byte] {
             var result = arr
-            while !result.isEmpty && (result.first == .ascii.space || result.first == .ascii.htab) {
+            while !result.isEmpty && (result.first == ASCII.Code.space || result.first == ASCII.Code.htab) {
                 result.removeFirst()
             }
-            while !result.isEmpty && (result.last == .ascii.space || result.last == .ascii.htab) {
+            while !result.isEmpty && (result.last == ASCII.Code.space || result.last == ASCII.Code.htab) {
                 result.removeLast()
             }
             return result
         }
 
         // Helper to extract IRIs from angle-bracketed, comma-separated list
-        func parseIRIs(_ value: [UInt8]) -> [RFC_3987.IRI] {
+        func parseIRIs(_ value: [Byte]) -> [RFC_3987.IRI] {
             var iris: [RFC_3987.IRI] = []
-            var current: [UInt8] = []
+            var current: [Byte] = []
             var inBrackets = false
 
             for byte in value {
-                if byte == .ascii.lessThanSign {
+                if byte == ASCII.Code.lessThanSign {
                     inBrackets = true
                     current = []
-                } else if byte == .ascii.greaterThanSign {
+                } else if byte == ASCII.Code.greaterThanSign {
                     inBrackets = false
                     if !current.isEmpty {
                         let iriString = String(decoding: current, as: UTF8.self)
@@ -249,10 +249,10 @@ extension RFC_2369.List.Header: Binary.ASCII.Serializable {
         }
 
         // Split into lines
-        var lines: [[UInt8]] = []
-        var currentLine: [UInt8] = []
+        var lines: [[Byte]] = []
+        var currentLine: [Byte] = []
         for byte in byteArray {
-            if byte == .ascii.cr || byte == .ascii.lf {
+            if byte == ASCII.Code.cr || byte == ASCII.Code.lf {
                 if !currentLine.isEmpty {
                     lines.append(currentLine)
                     currentLine = []
@@ -273,7 +273,7 @@ extension RFC_2369.List.Header: Binary.ASCII.Serializable {
         var archive: RFC_3987.IRI?
 
         for line in lines {
-            guard let colonIndex = line.firstIndex(of: .ascii.colon) else { continue }
+            guard let colonIndex = line.firstIndex(where: { $0 == ASCII.Code.colon }) else { continue }
 
             let fieldNameBytes = trimWhitespace(Array(line[..<colonIndex]))
             let fieldValueBytes = trimWhitespace(Array(line[(colonIndex + 1)...]))
