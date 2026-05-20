@@ -235,7 +235,7 @@ struct `RFC 2369 List Header Tests` {
             post: .noPosting
         )
 
-        let bytes = [UInt8](headers)
+        let bytes = [Byte](headers)
         let string = String(decoding: bytes, as: UTF8.self)
 
         #expect(string.contains("List-Help: <https://example.com/help>"))
@@ -245,12 +245,12 @@ struct `RFC 2369 List Header Tests` {
     @Test
     func `List.Post serializes to bytes correctly`() {
         let noPosting = RFC_2369.List.Post.noPosting
-        let noBytes = [UInt8](noPosting)
-        #expect(noBytes == Array("NO".utf8))
+        let noBytes = [Byte](noPosting)
+        #expect(noBytes == Array<Byte>("NO".utf8))
 
         let uris = RFC_2369.List.Post.uris([RFC_3987.IRI("mailto:list@example.com")])
-        let uriBytes = [UInt8](uris)
-        #expect(uriBytes == Array("<mailto:list@example.com>".utf8))
+        let uriBytes = [Byte](uris)
+        #expect(uriBytes == Array<Byte>("<mailto:list@example.com>".utf8))
     }
 
     // MARK: - Codable Tests

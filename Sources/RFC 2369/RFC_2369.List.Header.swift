@@ -214,10 +214,14 @@ extension RFC_2369.List.Header: Binary.ASCII.Serializable {
         // Helper to trim whitespace
         func trimWhitespace(_ arr: [Byte]) -> [Byte] {
             var result = arr
-            while !result.isEmpty && (result.first == ASCII.Code.space || result.first == ASCII.Code.htab) {
+            while let firstByte = result.first {
+                let code = ASCII.Code(firstByte)
+                guard code == ASCII.Code.space || code == ASCII.Code.htab else { break }
                 result.removeFirst()
             }
-            while !result.isEmpty && (result.last == ASCII.Code.space || result.last == ASCII.Code.htab) {
+            while let lastByte = result.last {
+                let code = ASCII.Code(lastByte)
+                guard code == ASCII.Code.space || code == ASCII.Code.htab else { break }
                 result.removeLast()
             }
             return result
@@ -230,10 +234,11 @@ extension RFC_2369.List.Header: Binary.ASCII.Serializable {
             var inBrackets = false
 
             for byte in value {
-                if byte == ASCII.Code.lessThanSign {
+                let code = ASCII.Code(byte)
+                if code == ASCII.Code.lessThanSign {
                     inBrackets = true
                     current = []
-                } else if byte == ASCII.Code.greaterThanSign {
+                } else if code == ASCII.Code.greaterThanSign {
                     inBrackets = false
                     if !current.isEmpty {
                         let iriString = String(decoding: current, as: UTF8.self)
@@ -252,7 +257,8 @@ extension RFC_2369.List.Header: Binary.ASCII.Serializable {
         var lines: [[Byte]] = []
         var currentLine: [Byte] = []
         for byte in byteArray {
-            if byte == ASCII.Code.cr || byte == ASCII.Code.lf {
+            let code = ASCII.Code(byte)
+            if code == ASCII.Code.cr || code == ASCII.Code.lf {
                 if !currentLine.isEmpty {
                     lines.append(currentLine)
                     currentLine = []
@@ -273,7 +279,7 @@ extension RFC_2369.List.Header: Binary.ASCII.Serializable {
         var archive: RFC_3987.IRI?
 
         for line in lines {
-            guard let colonIndex = line.firstIndex(where: { $0 == ASCII.Code.colon }) else { continue }
+            guard let colonIndex = line.firstIndex(where: { ASCII.Code($0) == ASCII.Code.colon }) else { continue }
 
             let fieldNameBytes = trimWhitespace(Array(line[..<colonIndex]))
             let fieldValueBytes = trimWhitespace(Array(line[(colonIndex + 1)...]))

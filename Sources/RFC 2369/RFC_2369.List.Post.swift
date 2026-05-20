@@ -123,12 +123,14 @@ extension RFC_2369.List.Post: Binary.ASCII.Serializable {
         var byteArray = Array(bytes)
 
         // Strip leading/trailing whitespace
-        while !byteArray.isEmpty
-            && (byteArray.first == ASCII.Code.space || byteArray.first == ASCII.Code.htab) {
+        while let firstByte = byteArray.first {
+            let code = ASCII.Code(firstByte)
+            guard code == ASCII.Code.space || code == ASCII.Code.htab else { break }
             byteArray.removeFirst()
         }
-        while !byteArray.isEmpty
-            && (byteArray.last == ASCII.Code.space || byteArray.last == ASCII.Code.htab) {
+        while let lastByte = byteArray.last {
+            let code = ASCII.Code(lastByte)
+            guard code == ASCII.Code.space || code == ASCII.Code.htab else { break }
             byteArray.removeLast()
         }
 
@@ -136,8 +138,8 @@ extension RFC_2369.List.Post: Binary.ASCII.Serializable {
 
         // Check for "NO" (case-insensitive)
         if byteArray.count == 2
-            && byteArray[0] == ASCII.Code.N
-            && byteArray[1] == ASCII.Code.O {
+            && ASCII.Code(byteArray[0]) == ASCII.Code.N
+            && ASCII.Code(byteArray[1]) == ASCII.Code.O {
             self = .noPosting
             return
         }
@@ -148,10 +150,11 @@ extension RFC_2369.List.Post: Binary.ASCII.Serializable {
         var inBrackets = false
 
         for byte in byteArray {
-            if byte == ASCII.Code.lessThanSign {
+            let code = ASCII.Code(byte)
+            if code == ASCII.Code.lessThanSign {
                 inBrackets = true
                 current = []
-            } else if byte == ASCII.Code.greaterThanSign {
+            } else if code == ASCII.Code.greaterThanSign {
                 inBrackets = false
                 if !current.isEmpty {
                     let iriString = String(decoding: current, as: UTF8.self)
