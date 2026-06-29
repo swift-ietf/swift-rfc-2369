@@ -216,12 +216,12 @@ extension RFC_2369.List.Header: Binary.ASCII.Serializable {
         func trimWhitespace(_ arr: [Byte]) -> [Byte] {
             var result = arr
             while let firstByte = result.first {
-                let code = ASCII.Code(firstByte)
+                let code = try? ASCII.Code(firstByte)
                 guard code == ASCII.Code.space || code == ASCII.Code.htab else { break }
                 result.removeFirst()
             }
             while let lastByte = result.last {
-                let code = ASCII.Code(lastByte)
+                let code = try? ASCII.Code(lastByte)
                 guard code == ASCII.Code.space || code == ASCII.Code.htab else { break }
                 result.removeLast()
             }
@@ -235,7 +235,7 @@ extension RFC_2369.List.Header: Binary.ASCII.Serializable {
             var inBrackets = false
 
             for byte in value {
-                let code = ASCII.Code(byte)
+                let code = try? ASCII.Code(byte)
                 if code == ASCII.Code.lessThanSign {
                     inBrackets = true
                     current = []
@@ -258,7 +258,7 @@ extension RFC_2369.List.Header: Binary.ASCII.Serializable {
         var lines: [[Byte]] = []
         var currentLine: [Byte] = []
         for byte in byteArray {
-            let code = ASCII.Code(byte)
+            let code = try? ASCII.Code(byte)
             if code == ASCII.Code.cr || code == ASCII.Code.lf {
                 if !currentLine.isEmpty {
                     lines.append(currentLine)
@@ -280,7 +280,7 @@ extension RFC_2369.List.Header: Binary.ASCII.Serializable {
         var archive: RFC_3987.IRI?
 
         for line in lines {
-            guard let colonIndex = line.firstIndex(where: { ASCII.Code($0) == ASCII.Code.colon }) else { continue }
+            guard let colonIndex = line.firstIndex(where: { (try? ASCII.Code($0)) == ASCII.Code.colon }) else { continue }
 
             let fieldNameBytes = trimWhitespace(Array(line[..<colonIndex]))
             let fieldValueBytes = trimWhitespace(Array(line[(colonIndex + 1)...]))

@@ -124,12 +124,12 @@ extension RFC_2369.List.Post: Binary.ASCII.Serializable {
 
         // Strip leading/trailing whitespace
         while let firstByte = byteArray.first {
-            let code = ASCII.Code(firstByte)
+            let code = try? ASCII.Code(firstByte)
             guard code == ASCII.Code.space || code == ASCII.Code.htab else { break }
             byteArray.removeFirst()
         }
         while let lastByte = byteArray.last {
-            let code = ASCII.Code(lastByte)
+            let code = try? ASCII.Code(lastByte)
             guard code == ASCII.Code.space || code == ASCII.Code.htab else { break }
             byteArray.removeLast()
         }
@@ -138,8 +138,8 @@ extension RFC_2369.List.Post: Binary.ASCII.Serializable {
 
         // Check for "NO" (case-insensitive)
         if byteArray.count == 2
-            && ASCII.Code(byteArray[0]) == ASCII.Code.N
-            && ASCII.Code(byteArray[1]) == ASCII.Code.O {
+            && (try? ASCII.Code(byteArray[0])) == ASCII.Code.N
+            && (try? ASCII.Code(byteArray[1])) == ASCII.Code.O {
             self = .noPosting
             return
         }
@@ -150,7 +150,7 @@ extension RFC_2369.List.Post: Binary.ASCII.Serializable {
         var inBrackets = false
 
         for byte in byteArray {
-            let code = ASCII.Code(byte)
+            let code = try? ASCII.Code(byte)
             if code == ASCII.Code.lessThanSign {
                 inBrackets = true
                 current = []
