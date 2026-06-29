@@ -1,6 +1,7 @@
 import Foundation
 import RFC_3987
 import Testing
+import Binary_Serializable_Primitives
 
 @testable import RFC_2369
 
