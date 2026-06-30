@@ -12,7 +12,9 @@
 // ===----------------------------------------------------------------------===//
 
 public import ASCII_Serializer_Primitives
-import Binary_Serializable_Primitives
+public import Binary_Serializable_Primitives
+public import Parseable_ASCII_Primitives
+public import Serializer_Primitives
 
 extension RFC_2369.List {
     /// Complete set of list management headers as defined in RFC 2369
@@ -96,14 +98,33 @@ extension RFC_2369.List {
     }
 }
 
-// MARK: - Binary.ASCII.Serializable
+// MARK: - Serializable
 
-extension RFC_2369.List.Header: Binary.ASCII.Serializable {
-    //    public static func serialize: @Sendable (Self) -> [Byte] = [Byte].init
-    static public func serialize<Buffer>(
-        ascii header: RFC_2369.List.Header,
+extension RFC_2369.List.Header: Serializable, ASCII.Serializable, Binary.Serializable {
+    /// Canonical ASCII serializer for the RFC 2369 List header block.
+    public static var serializer: Serializer_Primitives.Serializer.Pure<Self, [ASCII.Code]> {
+        Serializer_Primitives.Serializer.Pure { header, buffer in
+            var bytes: [Byte] = []
+            serializeBytes(header, into: &bytes)
+            buffer.append(contentsOf: bytes.map { ASCII.Code(unchecked: $0) })
+        }
+    }
+
+    /// Explicit `Binary.Serializable` witness disambiguating the two
+    /// constraint-incomparable `serialize(_:into:)` defaults.
+    public static func serialize<Buffer: RangeReplaceableCollection>(
+        _ value: Self,
         into buffer: inout Buffer
-    ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {
+    ) where Buffer.Element == Byte {
+        serializeBytes(value, into: &buffer)
+    }
+
+    /// Byte-domain serialization body. The nested `Post` serializes via the
+    /// family-Codable `Array<Byte>(_:)` generic; IRI values may be non-ASCII.
+    private static func serializeBytes<Buffer: RangeReplaceableCollection>(
+        _ header: Self,
+        into buffer: inout Buffer
+    ) where Buffer.Element == Byte {
         // List-Help
         if let help = header.help {
             buffer.append(contentsOf: Array<Byte>("List-Help".utf8))
@@ -192,6 +213,15 @@ extension RFC_2369.List.Header: Binary.ASCII.Serializable {
             buffer.append(ASCII.Code.lf)
         }
     }
+}
+
+// MARK: - Parseable
+
+extension RFC_2369.List.Header: ASCII.Parseable {
+    /// Creates a list header block by validating `string`'s UTF-8 bytes.
+    public init(_ string: some StringProtocol) throws(Error) {
+        try self.init(ascii: [Byte](string.utf8))
+    }
 
     /// Parses list headers from ASCII bytes (AUTHORITATIVE IMPLEMENTATION)
     ///
@@ -208,7 +238,7 @@ extension RFC_2369.List.Header: Binary.ASCII.Serializable {
     ///
     /// - Parameter bytes: The header as ASCII bytes
     /// - Throws: `Error` if parsing fails
-    public init<Bytes: Collection>(ascii bytes: Bytes, in context: Void = ()) throws(Error)
+    public init<Bytes: Collection>(ascii bytes: Bytes) throws(Error)
     where Bytes.Element == Byte {
         let byteArray = Array(bytes)
 
@@ -338,8 +368,16 @@ extension RFC_2369.List.Header: Binary.ASCII.Serializable {
 
 // MARK: - Protocol Conformances
 
-extension RFC_2369.List.Header: Binary.ASCII.RawRepresentable {
+extension RFC_2369.List.Header: Swift.RawRepresentable {
     public typealias RawValue = String
+
+    /// The header block's ASCII serialization as a `String` (computed; the
+    /// rawValue is derived from serialization, not stored).
+    public var rawValue: String {
+        String(decoding: serialized.underlying, as: UTF8.self)
+    }
+
+    public init?(rawValue: String) { try? self.init(rawValue) }
 }
 
 extension RFC_2369.List.Header: CustomStringConvertible {

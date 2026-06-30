@@ -12,6 +12,9 @@
 // ===----------------------------------------------------------------------===//
 
 public import ASCII_Serializer_Primitives
+public import Binary_Serializable_Primitives
+public import Parseable_ASCII_Primitives
+public import Serializer_Primitives
 
 extension RFC_2369.List {
     /// Value for the List-Post header as defined in RFC 2369 Section 3.4
@@ -67,13 +70,33 @@ extension RFC_2369.List {
     }
 }
 
-// MARK: - Binary.ASCII.Serializable
+// MARK: - Serializable
 
-extension RFC_2369.List.Post: Binary.ASCII.Serializable {
-    static public func serialize<Buffer>(
-        ascii post: RFC_2369.List.Post,
+extension RFC_2369.List.Post: Serializable, ASCII.Serializable, Binary.Serializable {
+    /// Canonical ASCII serializer for the RFC 2369 List-Post value.
+    public static var serializer: Serializer_Primitives.Serializer.Pure<Self, [ASCII.Code]> {
+        Serializer_Primitives.Serializer.Pure { post, buffer in
+            var bytes: [Byte] = []
+            serializeBytes(post, into: &bytes)
+            buffer.append(contentsOf: bytes.map { ASCII.Code(unchecked: $0) })
+        }
+    }
+
+    /// Explicit `Binary.Serializable` witness disambiguating the two
+    /// constraint-incomparable `serialize(_:into:)` defaults.
+    public static func serialize<Buffer: RangeReplaceableCollection>(
+        _ value: Self,
         into buffer: inout Buffer
-    ) where Buffer: RangeReplaceableCollection, Buffer.Element == Byte {
+    ) where Buffer.Element == Byte {
+        serializeBytes(value, into: &buffer)
+    }
+
+    /// Byte-domain serialization body. The nested IRIs serialize via their own
+    /// migrated family-Codable `.serialized` ([Byte]); IRI values may be non-ASCII.
+    private static func serializeBytes<Buffer: RangeReplaceableCollection>(
+        _ post: Self,
+        into buffer: inout Buffer
+    ) where Buffer.Element == Byte {
         switch post {
         case .noPosting:
             buffer.append(ASCII.Code.N)
@@ -86,10 +109,19 @@ extension RFC_2369.List.Post: Binary.ASCII.Serializable {
                     buffer.append(ASCII.Code.space)
                 }
                 buffer.append(ASCII.Code.lessThanSign)
-                buffer.append(ascii: iri)
+                buffer.append(contentsOf: iri.serialized)
                 buffer.append(ASCII.Code.greaterThanSign)
             }
         }
+    }
+}
+
+// MARK: - Parseable
+
+extension RFC_2369.List.Post: ASCII.Parseable {
+    /// Creates a List-Post value by validating `string`'s UTF-8 bytes.
+    public init(_ string: some StringProtocol) throws(Error) {
+        try self.init(ascii: [Byte](string.utf8))
     }
 
     /// Parses a List-Post value from ASCII bytes (AUTHORITATIVE IMPLEMENTATION)
@@ -118,7 +150,7 @@ extension RFC_2369.List.Post: Binary.ASCII.Serializable {
     ///
     /// - Parameter bytes: The post value as ASCII bytes
     /// - Throws: `Error` if parsing fails
-    public init<Bytes: Collection>(ascii bytes: Bytes, in context: Void = ()) throws(Error)
+    public init<Bytes: Collection>(ascii bytes: Bytes) throws(Error)
     where Bytes.Element == Byte {
         var byteArray = Array(bytes)
 
@@ -179,11 +211,24 @@ extension RFC_2369.List.Post: Binary.ASCII.Serializable {
 
 // MARK: - Protocol Conformances
 
-extension RFC_2369.List.Post: Binary.ASCII.RawRepresentable {
+extension RFC_2369.List.Post: Swift.RawRepresentable {
     public typealias RawValue = String
+
+    /// The List-Post value's ASCII serialization as a `String` (computed; the
+    /// rawValue is derived from serialization, not stored).
+    public var rawValue: String {
+        String(decoding: serialized.underlying, as: UTF8.self)
+    }
+
+    public init?(rawValue: String) { try? self.init(rawValue) }
 }
 
-extension RFC_2369.List.Post: CustomStringConvertible {}
+extension RFC_2369.List.Post: CustomStringConvertible {
+    /// The List-Post value's ASCII serialization decoded as a `String`.
+    public var description: String {
+        String(decoding: serialized.underlying, as: UTF8.self)
+    }
+}
 
 // MARK: - Codable
 
