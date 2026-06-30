@@ -14,7 +14,6 @@
 public import ASCII_Serializer_Primitives
 public import Binary_Serializable_Primitives
 public import Parseable_ASCII_Primitives
-public import Serializer_Primitives
 
 extension RFC_2369.List {
     /// Value for the List-Post header as defined in RFC 2369 Section 3.4
@@ -72,13 +71,31 @@ extension RFC_2369.List {
 
 // MARK: - Serializable
 
-extension RFC_2369.List.Post: Serializable, ASCII.Serializable, Binary.Serializable {
-    /// Canonical ASCII serializer for the RFC 2369 List-Post value.
-    public static var serializer: Serializer_Primitives.Serializer.Pure<Self, [ASCII.Code]> {
-        Serializer_Primitives.Serializer.Pure { post, buffer in
-            var bytes: [Byte] = []
-            serializeBytes(post, into: &bytes)
-            buffer.append(contentsOf: bytes.map { ASCII.Code(unchecked: $0) })
+extension RFC_2369.List.Post: ASCII.Serializable, Binary.Serializable {
+    /// Own `ASCII.Serializable` verb ([FAM-012]) — the RFC 2369 List-Post value
+    /// (angle-bracketed, comma-separated IRIs, or the `NO` sentinel), composing the
+    /// already-re-cut `RFC_3987.IRI` **ASCII** verb directly into the `ASCII.Code`
+    /// buffer (evergreen same-format composition; no byte-detour). Output is
+    /// identical to the Binary witness body (`serializeBytes`).
+    public static func serialize<Buffer: RangeReplaceableCollection>(
+        _ value: Self,
+        into buffer: inout Buffer
+    ) where Buffer.Element == ASCII.Code {
+        switch value {
+        case .noPosting:
+            buffer.append(ASCII.Code.N)
+            buffer.append(ASCII.Code.O)
+
+        case .uris(let iris):
+            for (index, iri) in iris.enumerated() {
+                if index > 0 {
+                    buffer.append(ASCII.Code.comma)
+                    buffer.append(ASCII.Code.space)
+                }
+                buffer.append(ASCII.Code.lessThanSign)
+                RFC_3987.IRI.serialize(iri, into: &buffer)
+                buffer.append(ASCII.Code.greaterThanSign)
+            }
         }
     }
 
