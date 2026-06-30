@@ -14,7 +14,6 @@
 public import ASCII_Serializer_Primitives
 public import Binary_Serializable_Primitives
 public import Parseable_ASCII_Primitives
-public import Serializer_Primitives
 
 extension RFC_2369.List {
     /// Complete set of list management headers as defined in RFC 2369
@@ -100,13 +99,103 @@ extension RFC_2369.List {
 
 // MARK: - Serializable
 
-extension RFC_2369.List.Header: Serializable, ASCII.Serializable, Binary.Serializable {
-    /// Canonical ASCII serializer for the RFC 2369 List header block.
-    public static var serializer: Serializer_Primitives.Serializer.Pure<Self, [ASCII.Code]> {
-        Serializer_Primitives.Serializer.Pure { header, buffer in
-            var bytes: [Byte] = []
-            serializeBytes(header, into: &bytes)
-            buffer.append(contentsOf: bytes.map { ASCII.Code(unchecked: $0) })
+extension RFC_2369.List.Header: ASCII.Serializable, Binary.Serializable {
+    /// Own `ASCII.Serializable` verb ([FAM-012]) — the RFC 2369 List header block,
+    /// composing the already-re-cut `RFC_3987.IRI` and `RFC_2369.List.Post` **ASCII**
+    /// verbs directly into the `ASCII.Code` buffer (evergreen same-format composition;
+    /// no byte-detour, no property-reach). The conformer's own field-name labels and
+    /// delimiters are leaf-emitted on the ASCII-code substrate. Output is identical to
+    /// the Binary witness body (`serializeBytes`).
+    public static func serialize<Buffer: RangeReplaceableCollection>(
+        _ value: Self,
+        into buffer: inout Buffer
+    ) where Buffer.Element == ASCII.Code {
+        // List-Help
+        if let help = value.help {
+            buffer.append(contentsOf: "List-Help".utf8.map { ASCII.Code(unchecked: Byte($0)) })
+            buffer.append(ASCII.Code.colon)
+            buffer.append(ASCII.Code.space)
+            buffer.append(ASCII.Code.lessThanSign)
+            RFC_3987.IRI.serialize(help, into: &buffer)
+            buffer.append(ASCII.Code.greaterThanSign)
+            buffer.append(ASCII.Code.cr)
+            buffer.append(ASCII.Code.lf)
+        }
+
+        // List-Unsubscribe
+        if let unsubscribe = value.unsubscribe, !unsubscribe.isEmpty {
+            buffer.append(contentsOf: "List-Unsubscribe".utf8.map { ASCII.Code(unchecked: Byte($0)) })
+            buffer.append(ASCII.Code.colon)
+            buffer.append(ASCII.Code.space)
+            for (index, iri) in unsubscribe.enumerated() {
+                if index > 0 {
+                    buffer.append(ASCII.Code.comma)
+                    buffer.append(ASCII.Code.space)
+                }
+                buffer.append(ASCII.Code.lessThanSign)
+                RFC_3987.IRI.serialize(iri, into: &buffer)
+                buffer.append(ASCII.Code.greaterThanSign)
+            }
+            buffer.append(ASCII.Code.cr)
+            buffer.append(ASCII.Code.lf)
+        }
+
+        // List-Subscribe
+        if let subscribe = value.subscribe, !subscribe.isEmpty {
+            buffer.append(contentsOf: "List-Subscribe".utf8.map { ASCII.Code(unchecked: Byte($0)) })
+            buffer.append(ASCII.Code.colon)
+            buffer.append(ASCII.Code.space)
+            for (index, iri) in subscribe.enumerated() {
+                if index > 0 {
+                    buffer.append(ASCII.Code.comma)
+                    buffer.append(ASCII.Code.space)
+                }
+                buffer.append(ASCII.Code.lessThanSign)
+                RFC_3987.IRI.serialize(iri, into: &buffer)
+                buffer.append(ASCII.Code.greaterThanSign)
+            }
+            buffer.append(ASCII.Code.cr)
+            buffer.append(ASCII.Code.lf)
+        }
+
+        // List-Post
+        if let post = value.post {
+            buffer.append(contentsOf: "List-Post".utf8.map { ASCII.Code(unchecked: Byte($0)) })
+            buffer.append(ASCII.Code.colon)
+            buffer.append(ASCII.Code.space)
+            RFC_2369.List.Post.serialize(post, into: &buffer)
+            buffer.append(ASCII.Code.cr)
+            buffer.append(ASCII.Code.lf)
+        }
+
+        // List-Owner
+        if let owner = value.owner, !owner.isEmpty {
+            buffer.append(contentsOf: "List-Owner".utf8.map { ASCII.Code(unchecked: Byte($0)) })
+            buffer.append(ASCII.Code.colon)
+            buffer.append(ASCII.Code.space)
+            for (index, iri) in owner.enumerated() {
+                if index > 0 {
+                    buffer.append(ASCII.Code.comma)
+                    buffer.append(ASCII.Code.space)
+                }
+                buffer.append(ASCII.Code.lessThanSign)
+                RFC_3987.IRI.serialize(iri, into: &buffer)
+                buffer.append(ASCII.Code.greaterThanSign)
+            }
+            buffer.append(ASCII.Code.cr)
+            buffer.append(ASCII.Code.lf)
+        }
+
+        // List-Archive
+        if let archive = value.archive {
+            buffer.append(contentsOf: "List-Archive".utf8.map { ASCII.Code(unchecked: Byte($0)) })
+            buffer.append(ASCII.Code.colon)
+            buffer.append(ASCII.Code.space)
+            buffer.append(ASCII.Code.lessThanSign)
+            RFC_3987.IRI.serialize(archive, into: &buffer)
+            buffer.append(ASCII.Code.greaterThanSign)
+            buffer.append(ASCII.Code.cr)
+            buffer.append(ASCII.Code.lf)
         }
     }
 
@@ -119,8 +208,10 @@ extension RFC_2369.List.Header: Serializable, ASCII.Serializable, Binary.Seriali
         serializeBytes(value, into: &buffer)
     }
 
-    /// Byte-domain serialization body. The nested `Post` serializes via the
-    /// family-Codable `Array<Byte>(_:)` generic; IRI values may be non-ASCII.
+    /// Byte-domain serialization body. Composes the re-cut `RFC_3987.IRI` and
+    /// `RFC_2369.List.Post` **Binary** witnesses (the universal verb resolves to the
+    /// `Byte` witness here — no byte-detour, no property-reach); the conformer's own
+    /// field-name labels and delimiters are leaf-emitted on the byte substrate.
     private static func serializeBytes<Buffer: RangeReplaceableCollection>(
         _ header: Self,
         into buffer: inout Buffer
@@ -131,7 +222,7 @@ extension RFC_2369.List.Header: Serializable, ASCII.Serializable, Binary.Seriali
             buffer.append(ASCII.Code.colon)
             buffer.append(ASCII.Code.space)
             buffer.append(ASCII.Code.lessThanSign)
-            buffer.append(contentsOf: Array<Byte>(help.value.utf8))
+            RFC_3987.IRI.serialize(help, into: &buffer)
             buffer.append(ASCII.Code.greaterThanSign)
             buffer.append(ASCII.Code.cr)
             buffer.append(ASCII.Code.lf)
@@ -148,7 +239,7 @@ extension RFC_2369.List.Header: Serializable, ASCII.Serializable, Binary.Seriali
                     buffer.append(ASCII.Code.space)
                 }
                 buffer.append(ASCII.Code.lessThanSign)
-                buffer.append(contentsOf: Array<Byte>(iri.value.utf8))
+                RFC_3987.IRI.serialize(iri, into: &buffer)
                 buffer.append(ASCII.Code.greaterThanSign)
             }
             buffer.append(ASCII.Code.cr)
@@ -166,7 +257,7 @@ extension RFC_2369.List.Header: Serializable, ASCII.Serializable, Binary.Seriali
                     buffer.append(ASCII.Code.space)
                 }
                 buffer.append(ASCII.Code.lessThanSign)
-                buffer.append(contentsOf: Array<Byte>(iri.value.utf8))
+                RFC_3987.IRI.serialize(iri, into: &buffer)
                 buffer.append(ASCII.Code.greaterThanSign)
             }
             buffer.append(ASCII.Code.cr)
@@ -178,7 +269,7 @@ extension RFC_2369.List.Header: Serializable, ASCII.Serializable, Binary.Seriali
             buffer.append(contentsOf: Array<Byte>("List-Post".utf8))
             buffer.append(ASCII.Code.colon)
             buffer.append(ASCII.Code.space)
-            buffer.append(contentsOf: Array<Byte>(post))
+            RFC_2369.List.Post.serialize(post, into: &buffer)
             buffer.append(ASCII.Code.cr)
             buffer.append(ASCII.Code.lf)
         }
@@ -194,7 +285,7 @@ extension RFC_2369.List.Header: Serializable, ASCII.Serializable, Binary.Seriali
                     buffer.append(ASCII.Code.space)
                 }
                 buffer.append(ASCII.Code.lessThanSign)
-                buffer.append(contentsOf: Array<Byte>(iri.value.utf8))
+                RFC_3987.IRI.serialize(iri, into: &buffer)
                 buffer.append(ASCII.Code.greaterThanSign)
             }
             buffer.append(ASCII.Code.cr)
@@ -207,7 +298,7 @@ extension RFC_2369.List.Header: Serializable, ASCII.Serializable, Binary.Seriali
             buffer.append(ASCII.Code.colon)
             buffer.append(ASCII.Code.space)
             buffer.append(ASCII.Code.lessThanSign)
-            buffer.append(contentsOf: Array<Byte>(archive.value.utf8))
+            RFC_3987.IRI.serialize(archive, into: &buffer)
             buffer.append(ASCII.Code.greaterThanSign)
             buffer.append(ASCII.Code.cr)
             buffer.append(ASCII.Code.lf)
