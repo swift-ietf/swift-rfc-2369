@@ -108,8 +108,8 @@ extension RFC_2369.List.Post: ASCII.Serializable, Binary.Serializable {
         serializeBytes(value, into: &buffer)
     }
 
-    /// Byte-domain serialization body. The nested IRIs serialize via their own
-    /// migrated family-Codable `.serialized` ([Byte]); IRI values may be non-ASCII.
+    /// Byte-domain serialization body. The nested IRIs compose their own re-cut
+    /// `RFC_3987.IRI.serialize(_:into:)` verb directly; IRI values may be non-ASCII.
     private static func serializeBytes<Buffer: RangeReplaceableCollection>(
         _ post: Self,
         into buffer: inout Buffer
@@ -126,7 +126,7 @@ extension RFC_2369.List.Post: ASCII.Serializable, Binary.Serializable {
                     buffer.append(ASCII.Code.space)
                 }
                 buffer.append(ASCII.Code.lessThanSign)
-                buffer.append(contentsOf: iri.serialized)
+                RFC_3987.IRI.serialize(iri, into: &buffer)
                 buffer.append(ASCII.Code.greaterThanSign)
             }
         }
