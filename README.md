@@ -1,6 +1,6 @@
 # Swift RFC 2369
 
-[![CI](https://github.com/swift-standards/swift-rfc-2369/workflows/CI/badge.svg)](https://github.com/swift-standards/swift-rfc-2369/actions/workflows/ci.yml)
+[![CI](https://github.com/swift-ietf/swift-rfc-2369/workflows/CI/badge.svg)](https://github.com/swift-ietf/swift-rfc-2369/actions/workflows/ci.yml)
 ![Development Status](https://img.shields.io/badge/status-active--development-blue.svg)
 
 Swift implementation of RFC 2369: The Use of URLs as Meta-Syntax for Core Mail List Commands
@@ -27,7 +27,7 @@ Add swift-rfc-2369 to your package dependencies:
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/swift-standards/swift-rfc-2369.git", from: "0.1.0")
+    .package(url: "https://github.com/swift-ietf/swift-rfc-2369.git", from: "0.4.5")
 ]
 ```
 
@@ -192,9 +192,9 @@ public enum Post {
 
 ## Related Packages
 
-- [swift-rfc-3987](https://github.com/swift-standards/swift-rfc-3987) - IRI implementation
-- [swift-rfc-6068](https://github.com/swift-standards/swift-rfc-6068) - The 'mailto' URI Scheme
-- [swift-rfc-8058](https://github.com/swift-standards/swift-rfc-8058) - One-click unsubscribe (companion to RFC 2369)
+- [swift-rfc-3987](https://github.com/swift-ietf/swift-rfc-3987) - IRI implementation
+- [swift-rfc-6068](https://github.com/swift-ietf/swift-rfc-6068) - The 'mailto' URI Scheme
+- [swift-rfc-8058](https://github.com/swift-ietf/swift-rfc-8058) - One-click unsubscribe (companion to RFC 2369)
 
 ## License
 
