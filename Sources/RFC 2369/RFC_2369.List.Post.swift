@@ -188,7 +188,8 @@ extension RFC_2369.List.Post: ASCII.Parseable {
         // Check for "NO" (case-insensitive)
         if byteArray.count == 2
             && (try? ASCII.Code(byteArray[0])) == ASCII.Code.N
-            && (try? ASCII.Code(byteArray[1])) == ASCII.Code.O {
+            && (try? ASCII.Code(byteArray[1])) == ASCII.Code.O
+        {
             self = .noPosting
             return
         }

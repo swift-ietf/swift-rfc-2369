@@ -1,7 +1,7 @@
+import Binary_Serializable_Primitives
 import Foundation
 import RFC_3987
 import Testing
-import Binary_Serializable_Primitives
 
 @testable import RFC_2369
 
@@ -247,11 +247,11 @@ struct `RFC 2369 List Header Tests` {
     func `List.Post serializes to bytes correctly`() {
         let noPosting = RFC_2369.List.Post.noPosting
         let noBytes = [Byte](noPosting)
-        #expect(noBytes == Array<Byte>("NO".utf8))
+        #expect(noBytes == [Byte]("NO".utf8))
 
         let uris = RFC_2369.List.Post.uris([RFC_3987.IRI("mailto:list@example.com")])
         let uriBytes = [Byte](uris)
-        #expect(uriBytes == Array<Byte>("<mailto:list@example.com>".utf8))
+        #expect(uriBytes == [Byte]("<mailto:list@example.com>".utf8))
     }
 
     // MARK: - Codable Tests

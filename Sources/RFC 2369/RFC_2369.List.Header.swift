@@ -124,7 +124,9 @@ extension RFC_2369.List.Header: ASCII.Serializable, Binary.Serializable {
 
         // List-Unsubscribe
         if let unsubscribe = value.unsubscribe, !unsubscribe.isEmpty {
-            buffer.append(contentsOf: "List-Unsubscribe".utf8.map { ASCII.Code(unchecked: Byte($0)) })
+            buffer.append(
+                contentsOf: "List-Unsubscribe".utf8.map { ASCII.Code(unchecked: Byte($0)) }
+            )
             buffer.append(ASCII.Code.colon)
             buffer.append(ASCII.Code.space)
             for (index, iri) in unsubscribe.enumerated() {
@@ -218,7 +220,7 @@ extension RFC_2369.List.Header: ASCII.Serializable, Binary.Serializable {
     ) where Buffer.Element == Byte {
         // List-Help
         if let help = header.help {
-            buffer.append(contentsOf: Array<Byte>("List-Help".utf8))
+            buffer.append(contentsOf: [Byte]("List-Help".utf8))
             buffer.append(ASCII.Code.colon)
             buffer.append(ASCII.Code.space)
             buffer.append(ASCII.Code.lessThanSign)
@@ -230,7 +232,7 @@ extension RFC_2369.List.Header: ASCII.Serializable, Binary.Serializable {
 
         // List-Unsubscribe
         if let unsubscribe = header.unsubscribe, !unsubscribe.isEmpty {
-            buffer.append(contentsOf: Array<Byte>("List-Unsubscribe".utf8))
+            buffer.append(contentsOf: [Byte]("List-Unsubscribe".utf8))
             buffer.append(ASCII.Code.colon)
             buffer.append(ASCII.Code.space)
             for (index, iri) in unsubscribe.enumerated() {
@@ -248,7 +250,7 @@ extension RFC_2369.List.Header: ASCII.Serializable, Binary.Serializable {
 
         // List-Subscribe
         if let subscribe = header.subscribe, !subscribe.isEmpty {
-            buffer.append(contentsOf: Array<Byte>("List-Subscribe".utf8))
+            buffer.append(contentsOf: [Byte]("List-Subscribe".utf8))
             buffer.append(ASCII.Code.colon)
             buffer.append(ASCII.Code.space)
             for (index, iri) in subscribe.enumerated() {
@@ -266,7 +268,7 @@ extension RFC_2369.List.Header: ASCII.Serializable, Binary.Serializable {
 
         // List-Post
         if let post = header.post {
-            buffer.append(contentsOf: Array<Byte>("List-Post".utf8))
+            buffer.append(contentsOf: [Byte]("List-Post".utf8))
             buffer.append(ASCII.Code.colon)
             buffer.append(ASCII.Code.space)
             RFC_2369.List.Post.serialize(post, into: &buffer)
@@ -276,7 +278,7 @@ extension RFC_2369.List.Header: ASCII.Serializable, Binary.Serializable {
 
         // List-Owner
         if let owner = header.owner, !owner.isEmpty {
-            buffer.append(contentsOf: Array<Byte>("List-Owner".utf8))
+            buffer.append(contentsOf: [Byte]("List-Owner".utf8))
             buffer.append(ASCII.Code.colon)
             buffer.append(ASCII.Code.space)
             for (index, iri) in owner.enumerated() {
@@ -294,7 +296,7 @@ extension RFC_2369.List.Header: ASCII.Serializable, Binary.Serializable {
 
         // List-Archive
         if let archive = header.archive {
-            buffer.append(contentsOf: Array<Byte>("List-Archive".utf8))
+            buffer.append(contentsOf: [Byte]("List-Archive".utf8))
             buffer.append(ASCII.Code.colon)
             buffer.append(ASCII.Code.space)
             buffer.append(ASCII.Code.lessThanSign)
@@ -401,7 +403,11 @@ extension RFC_2369.List.Header: ASCII.Parseable {
         var archive: RFC_3987.IRI?
 
         for line in lines {
-            guard let colonIndex = line.firstIndex(where: { (try? ASCII.Code($0)) == ASCII.Code.colon }) else { continue }
+            guard
+                let colonIndex = line.firstIndex(where: {
+                    (try? ASCII.Code($0)) == ASCII.Code.colon
+                })
+            else { continue }
 
             let fieldNameBytes = trimWhitespace(Array(line[..<colonIndex]))
             let fieldValueBytes = trimWhitespace(Array(line[(colonIndex + 1)...]))

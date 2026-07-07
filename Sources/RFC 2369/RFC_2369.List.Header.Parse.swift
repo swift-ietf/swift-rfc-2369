@@ -70,8 +70,9 @@ extension RFC_2369.List.Header.Parse: Parser.`Protocol` {
     static func _skipSeparators(_ input: inout Input) {
         while input.startIndex < input.endIndex {
             let byte = input[input.startIndex]
-            guard byte == 0x20 || byte == 0x09 || byte == 0x2C
-                || byte == 0x0D || byte == 0x0A
+            guard
+                byte == 0x20 || byte == 0x09 || byte == 0x2C
+                    || byte == 0x0D || byte == 0x0A
             else { break }
             input = input[input.index(after: input.startIndex)...]
         }
