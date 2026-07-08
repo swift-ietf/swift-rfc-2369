@@ -15,12 +15,14 @@ extension RFC_2369.List.Header {
     /// Errors during list header parsing
     public enum Error: Swift.Error, Sendable, Equatable, CustomStringConvertible {
         case invalidIRI(_ value: String)
+    }
+}
 
-        public var description: String {
-            switch self {
-            case .invalidIRI(let value):
-                return "Invalid IRI in list header: '\(value)'"
-            }
+extension RFC_2369.List.Header.Error {
+    public var description: String {
+        switch self {
+        case .invalidIRI(let value):
+            return "Invalid IRI in list header: '\(value)'"
         }
     }
 }

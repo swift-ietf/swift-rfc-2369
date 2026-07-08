@@ -67,7 +67,7 @@ extension RFC_2369.List.Header.Parse: Parser.`Protocol` {
     }
 
     @inlinable
-    static func _skipSeparators(_ input: inout Input) {
+    package static func _skipSeparators(_ input: inout Input) {
         while input.startIndex < input.endIndex {
             let byte = input[input.startIndex]
             guard
