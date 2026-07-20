@@ -169,7 +169,33 @@ extension RFC_2369.List.Post: ASCII.Parseable {
     /// - Throws: `Error` if parsing fails
     public init<Bytes: Collection>(ascii bytes: Bytes) throws(Error)
     where Bytes.Element == Byte {
-        var byteArray = Array(bytes)
+        // Strip RFC 822 comments — parenthesized, nestable — outside angle
+        // brackets, so RFC 2369 §3.4 example forms such as
+        // `NO (posting not allowed on this list)` and
+        // `<mailto:moderator@host.com> (Postings are Moderated)` classify
+        // identically to their comment-free forms. Parentheses inside `<...>`
+        // are IRI content and are preserved.
+        var byteArray: [Byte] = []
+        var commentDepth = 0
+        var inAngleBrackets = false
+        for byte in bytes {
+            let code = try? ASCII.Code(byte)
+            if !inAngleBrackets, code == ASCII.Code.leftParenthesis {
+                commentDepth += 1
+                continue
+            }
+            if !inAngleBrackets, code == ASCII.Code.rightParenthesis, commentDepth > 0 {
+                commentDepth -= 1
+                continue
+            }
+            guard commentDepth == 0 else { continue }
+            if code == ASCII.Code.lessThanSign {
+                inAngleBrackets = true
+            } else if code == ASCII.Code.greaterThanSign {
+                inAngleBrackets = false
+            }
+            byteArray.append(byte)
+        }
 
         // Strip leading/trailing whitespace
         while let firstByte = byteArray.first {
@@ -186,9 +212,11 @@ extension RFC_2369.List.Post: ASCII.Parseable {
         guard !byteArray.isEmpty else { throw Error.empty }
 
         // Check for "NO" (case-insensitive)
-        if byteArray.count == 2
-            && (try? ASCII.Code(byteArray[0])) == ASCII.Code.N
-            && (try? ASCII.Code(byteArray[1])) == ASCII.Code.O
+        if byteArray.count == 2,
+            let first = try? ASCII.Code(byteArray[0]),
+            let second = try? ASCII.Code(byteArray[1]),
+            first == ASCII.Code.N || first == ASCII.Code.n,
+            second == ASCII.Code.O || second == ASCII.Code.o
         {
             self = .noPosting
             return

@@ -428,15 +428,10 @@ extension RFC_2369.List.Header: ASCII.Parseable {
                 subscribe = iris.isEmpty ? nil : iris
 
             case "list-post":
-                // Check for "NO" (case-insensitive)
-                let trimmed = trimWhitespace(fieldValueBytes)
-                let valueString = String(decoding: trimmed, as: UTF8.self).uppercased()
-                if valueString == "NO" {
-                    post = .noPosting
-                } else {
-                    let iris = parseIRIs(fieldValueBytes)
-                    post = iris.isEmpty ? nil : .uris(iris)
-                }
+                // Delegate to the single authoritative List-Post value parser so
+                // both entry points classify the RFC 2369 §3.4 example forms
+                // (including RFC 822 comments) identically.
+                post = try? RFC_2369.List.Post(ascii: fieldValueBytes)
 
             case "list-owner":
                 let iris = parseIRIs(fieldValueBytes)
