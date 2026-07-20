@@ -377,22 +377,51 @@ extension RFC_2369.List.Header: ASCII.Parseable {
             return iris
         }
 
-        // Split into lines
-        var lines: [[Byte]] = []
+        // Split into physical lines (CRLF, lone CR, or lone LF terminated),
+        // preserving empty lines so folding boundaries are visible.
+        var physicalLines: [[Byte]] = []
         var currentLine: [Byte] = []
+        var previousWasCR = false
         for byte in byteArray {
             let code = try? ASCII.Code(byte)
-            if code == ASCII.Code.cr || code == ASCII.Code.lf {
-                if !currentLine.isEmpty {
-                    lines.append(currentLine)
-                    currentLine = []
+            if code == ASCII.Code.lf {
+                if previousWasCR {
+                    // Second half of a CRLF pair — the line already ended at CR.
+                    previousWasCR = false
+                    continue
                 }
+                physicalLines.append(currentLine)
+                currentLine = []
+            } else if code == ASCII.Code.cr {
+                physicalLines.append(currentLine)
+                currentLine = []
+                previousWasCR = true
             } else {
+                previousWasCR = false
                 currentLine.append(byte)
             }
         }
         if !currentLine.isEmpty {
-            lines.append(currentLine)
+            physicalLines.append(currentLine)
+        }
+
+        // Unfold per RFC 822 §3.1.1 / RFC 5322 §2.2.3: a line break followed by
+        // SP/HTAB continues the previous field. A blank line ends folding — a
+        // whitespace-led line after it does not join the earlier field.
+        var lines: [[Byte]] = []
+        var previousPhysicalLineWasNonEmpty = false
+        for line in physicalLines {
+            let startsWithFoldingWhitespace: Bool =
+                line.first.map { byte in
+                    let code = try? ASCII.Code(byte)
+                    return code == ASCII.Code.space || code == ASCII.Code.htab
+                } ?? false
+            if startsWithFoldingWhitespace, previousPhysicalLineWasNonEmpty, !lines.isEmpty {
+                lines[lines.count - 1].append(contentsOf: line)
+            } else if !line.isEmpty {
+                lines.append(line)
+            }
+            previousPhysicalLineWasNonEmpty = !line.isEmpty
         }
 
         var help: RFC_3987.IRI?
