@@ -1,7 +1,7 @@
 # Swift RFC 2369
 
-[![CI](https://github.com/swift-ietf/swift-rfc-2369/workflows/CI/badge.svg)](https://github.com/swift-ietf/swift-rfc-2369/actions/workflows/ci.yml)
 ![Development Status](https://img.shields.io/badge/status-active--development-blue.svg)
+[![CI](https://github.com/swift-ietf/swift-rfc-2369/workflows/CI/badge.svg)](https://github.com/swift-ietf/swift-rfc-2369/actions/workflows/ci.yml)
 
 Swift implementation of RFC 2369: The Use of URLs as Meta-Syntax for Core Mail List Commands
 
