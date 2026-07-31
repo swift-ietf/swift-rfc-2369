@@ -179,7 +179,12 @@ extension RFC_2369.List.Post: ASCII.Parseable {
         var commentDepth = 0
         var inAngleBrackets = false
         for byte in bytes {
-            let code = try? ASCII.Code(byte)
+            let code: ASCII.Code?
+            do throws(ASCII.Code.Error) {
+                code = try ASCII.Code(byte)
+            } catch {
+                code = nil
+            }
             if !inAngleBrackets, code == ASCII.Code.leftParenthesis {
                 commentDepth += 1
                 continue
@@ -199,12 +204,22 @@ extension RFC_2369.List.Post: ASCII.Parseable {
 
         // Strip leading/trailing whitespace
         while let firstByte = byteArray.first {
-            let code = try? ASCII.Code(firstByte)
+            let code: ASCII.Code?
+            do throws(ASCII.Code.Error) {
+                code = try ASCII.Code(firstByte)
+            } catch {
+                code = nil
+            }
             guard code == ASCII.Code.space || code == ASCII.Code.htab else { break }
             byteArray.removeFirst()
         }
         while let lastByte = byteArray.last {
-            let code = try? ASCII.Code(lastByte)
+            let code: ASCII.Code?
+            do throws(ASCII.Code.Error) {
+                code = try ASCII.Code(lastByte)
+            } catch {
+                code = nil
+            }
             guard code == ASCII.Code.space || code == ASCII.Code.htab else { break }
             byteArray.removeLast()
         }
@@ -212,14 +227,26 @@ extension RFC_2369.List.Post: ASCII.Parseable {
         guard !byteArray.isEmpty else { throw Error.empty }
 
         // Check for "NO" (case-insensitive)
-        if byteArray.count == 2,
-            let first = try? ASCII.Code(byteArray[0]),
-            let second = try? ASCII.Code(byteArray[1]),
-            first == ASCII.Code.N || first == ASCII.Code.n,
-            second == ASCII.Code.O || second == ASCII.Code.o
-        {
-            self = .noPosting
-            return
+        if byteArray.count == 2 {
+            let first: ASCII.Code?
+            do throws(ASCII.Code.Error) {
+                first = try ASCII.Code(byteArray[0])
+            } catch {
+                first = nil
+            }
+            let second: ASCII.Code?
+            do throws(ASCII.Code.Error) {
+                second = try ASCII.Code(byteArray[1])
+            } catch {
+                second = nil
+            }
+            if let first, let second,
+                first == ASCII.Code.N || first == ASCII.Code.n,
+                second == ASCII.Code.O || second == ASCII.Code.o
+            {
+                self = .noPosting
+                return
+            }
         }
 
         // Parse angle-bracketed, comma-separated IRIs
@@ -228,7 +255,12 @@ extension RFC_2369.List.Post: ASCII.Parseable {
         var inBrackets = false
 
         for byte in byteArray {
-            let code = try? ASCII.Code(byte)
+            let code: ASCII.Code?
+            do throws(ASCII.Code.Error) {
+                code = try ASCII.Code(byte)
+            } catch {
+                code = nil
+            }
             if code == ASCII.Code.lessThanSign {
                 inBrackets = true
                 current = []
@@ -236,9 +268,10 @@ extension RFC_2369.List.Post: ASCII.Parseable {
                 inBrackets = false
                 if !current.isEmpty {
                     let iriString = String(decoding: current, as: UTF8.self)
-                    if let iri = try? RFC_3987.IRI(iriString) {
+                    do throws(RFC_3987.IRI.Error) {
+                        let iri = try RFC_3987.IRI(iriString)
                         iris.append(iri)
-                    } else {
+                    } catch {
                         throw Error.invalidIRI(iriString)
                     }
                 }
@@ -266,7 +299,13 @@ extension RFC_2369.List.Post: Swift.RawRepresentable {
         String(decoding: serialized.underlying, as: UTF8.self)
     }
 
-    public init?(rawValue: String) { try? self.init(rawValue) }
+    public init?(rawValue: String) {
+        do throws(Error) {
+            try self.init(rawValue)
+        } catch {
+            return nil
+        }
+    }
 }
 
 extension RFC_2369.List.Post: CustomStringConvertible {
@@ -289,6 +328,7 @@ extension RFC_2369.List.Post: Codable {
         case noPosting
     }
 
+    // swiftlint:disable:next no_any_protocol_existential typed_throws_required - exact Decodable protocol requirement signature (stdlib; rule-exemptions protocol-requirement shape)
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(PostType.self, forKey: .type)
@@ -297,11 +337,13 @@ extension RFC_2369.List.Post: Codable {
         case .uris:
             let uris = try container.decode([RFC_3987.IRI].self, forKey: .uris)
             self = .uris(uris)
+
         case .noPosting:
             self = .noPosting
         }
     }
 
+    // swiftlint:disable:next no_any_protocol_existential typed_throws_required - exact Encodable protocol requirement signature (stdlib; rule-exemptions protocol-requirement shape)
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
@@ -309,6 +351,7 @@ extension RFC_2369.List.Post: Codable {
         case .uris(let iris):
             try container.encode(PostType.uris, forKey: .type)
             try container.encode(iris, forKey: .uris)
+
         case .noPosting:
             try container.encode(PostType.noPosting, forKey: .type)
         }

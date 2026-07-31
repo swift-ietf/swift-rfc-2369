@@ -7,7 +7,9 @@ extension RFC_2369.List.Header {
     @Suite
     struct `Edge Case` {
         @Test
-        func `List-Post NO with RFC 822 comment survives Header parsing per RFC 2369 section 3.4`() throws {
+        func `List-Post NO with RFC 822 comment survives Header parsing per RFC 2369 section 3.4`()
+            throws
+        {
             let header = try RFC_2369.List.Header(
                 "List-Post: NO (posting not allowed on this list)\r\n"
             )
@@ -15,7 +17,10 @@ extension RFC_2369.List.Header {
         }
 
         @Test
-        func `List-Post moderator URI with RFC 822 comment survives Header parsing per RFC 2369 section 3.4`() throws {
+        func
+            `List-Post moderator URI with RFC 822 comment survives Header parsing per RFC 2369 section 3.4`()
+            throws
+        {
             let header = try RFC_2369.List.Header(
                 "List-Post: <mailto:moderator@host.com> (Postings are Moderated)\r\n"
             )
@@ -23,12 +28,16 @@ extension RFC_2369.List.Header {
         }
 
         @Test
-        func `Folded List-Unsubscribe continuation line is unfolded per RFC 822 section 3.1.1`() throws {
+        func `Folded List-Unsubscribe continuation line is unfolded per RFC 822 section 3.1.1`()
+            throws
+        {
             let header = try RFC_2369.List.Header(
                 "List-Unsubscribe: <mailto:unsubscribe-a@example.com>,\r\n <mailto:unsubscribe-b@example.com>\r\n"
             )
             #expect(header.unsubscribe?.count == 2)
-            #expect(header.unsubscribe?.last == (try RFC_3987.IRI("mailto:unsubscribe-b@example.com")))
+            #expect(
+                header.unsubscribe?.last == (try RFC_3987.IRI("mailto:unsubscribe-b@example.com"))
+            )
         }
 
         @Test
@@ -48,7 +57,8 @@ extension RFC_2369.List.Header {
         }
 
         @Test
-        func `Whitespace-led line after a blank line does not fold into the previous field`() throws {
+        func `Whitespace-led line after a blank line does not fold into the previous field`() throws
+        {
             let header = try RFC_2369.List.Header(
                 "List-Help: <https://example.com/help>\r\n\r\n <https://example.com/other>\r\n"
             )

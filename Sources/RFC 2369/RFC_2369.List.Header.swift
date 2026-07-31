@@ -339,12 +339,22 @@ extension RFC_2369.List.Header: ASCII.Parseable {
         func trimWhitespace(_ arr: [Byte]) -> [Byte] {
             var result = arr
             while let firstByte = result.first {
-                let code = try? ASCII.Code(firstByte)
+                let code: ASCII.Code?
+                do throws(ASCII.Code.Error) {
+                    code = try ASCII.Code(firstByte)
+                } catch {
+                    code = nil
+                }
                 guard code == ASCII.Code.space || code == ASCII.Code.htab else { break }
                 result.removeFirst()
             }
             while let lastByte = result.last {
-                let code = try? ASCII.Code(lastByte)
+                let code: ASCII.Code?
+                do throws(ASCII.Code.Error) {
+                    code = try ASCII.Code(lastByte)
+                } catch {
+                    code = nil
+                }
                 guard code == ASCII.Code.space || code == ASCII.Code.htab else { break }
                 result.removeLast()
             }
@@ -358,7 +368,12 @@ extension RFC_2369.List.Header: ASCII.Parseable {
             var inBrackets = false
 
             for byte in value {
-                let code = try? ASCII.Code(byte)
+                let code: ASCII.Code?
+                do throws(ASCII.Code.Error) {
+                    code = try ASCII.Code(byte)
+                } catch {
+                    code = nil
+                }
                 if code == ASCII.Code.lessThanSign {
                     inBrackets = true
                     current = []
@@ -366,8 +381,12 @@ extension RFC_2369.List.Header: ASCII.Parseable {
                     inBrackets = false
                     if !current.isEmpty {
                         let iriString = String(decoding: current, as: UTF8.self)
-                        if let iri = try? RFC_3987.IRI(iriString) {
+                        do throws(RFC_3987.IRI.Error) {
+                            let iri = try RFC_3987.IRI(iriString)
                             iris.append(iri)
+                        } catch {
+                            // Invalid IRI in a header value is skipped, not fatal —
+                            // matches the prior `try?`-and-discard behavior.
                         }
                     }
                 } else if inBrackets {
@@ -383,7 +402,12 @@ extension RFC_2369.List.Header: ASCII.Parseable {
         var currentLine: [Byte] = []
         var previousWasCR = false
         for byte in byteArray {
-            let code = try? ASCII.Code(byte)
+            let code: ASCII.Code?
+            do throws(ASCII.Code.Error) {
+                code = try ASCII.Code(byte)
+            } catch {
+                code = nil
+            }
             if code == ASCII.Code.lf {
                 if previousWasCR {
                     // Second half of a CRLF pair — the line already ended at CR.
@@ -413,7 +437,12 @@ extension RFC_2369.List.Header: ASCII.Parseable {
         for line in physicalLines {
             let startsWithFoldingWhitespace: Bool =
                 line.first.map { byte in
-                    let code = try? ASCII.Code(byte)
+                    let code: ASCII.Code?
+                    do throws(ASCII.Code.Error) {
+                        code = try ASCII.Code(byte)
+                    } catch {
+                        code = nil
+                    }
                     return code == ASCII.Code.space || code == ASCII.Code.htab
                 } ?? false
             if startsWithFoldingWhitespace, previousPhysicalLineWasNonEmpty, !lines.isEmpty {
@@ -433,8 +462,14 @@ extension RFC_2369.List.Header: ASCII.Parseable {
 
         for line in lines {
             guard
-                let colonIndex = line.firstIndex(where: {
-                    (try? ASCII.Code($0)) == ASCII.Code.colon
+                let colonIndex = line.firstIndex(where: { byte in
+                    let code: ASCII.Code?
+                    do throws(ASCII.Code.Error) {
+                        code = try ASCII.Code(byte)
+                    } catch {
+                        code = nil
+                    }
+                    return code == ASCII.Code.colon
                 })
             else { continue }
 
@@ -460,7 +495,11 @@ extension RFC_2369.List.Header: ASCII.Parseable {
                 // Delegate to the single authoritative List-Post value parser so
                 // both entry points classify the RFC 2369 §3.4 example forms
                 // (including RFC 822 comments) identically.
-                post = try? RFC_2369.List.Post(ascii: fieldValueBytes)
+                do throws(RFC_2369.List.Post.Error) {
+                    post = try RFC_2369.List.Post(ascii: fieldValueBytes)
+                } catch {
+                    post = nil
+                }
 
             case "list-owner":
                 let iris = parseIRIs(fieldValueBytes)
@@ -498,7 +537,13 @@ extension RFC_2369.List.Header: Swift.RawRepresentable {
         String(decoding: serialized.underlying, as: UTF8.self)
     }
 
-    public init?(rawValue: String) { try? self.init(rawValue) }
+    public init?(rawValue: String) {
+        do throws(Error) {
+            try self.init(rawValue)
+        } catch {
+            return nil
+        }
+    }
 }
 
 extension RFC_2369.List.Header: CustomStringConvertible {

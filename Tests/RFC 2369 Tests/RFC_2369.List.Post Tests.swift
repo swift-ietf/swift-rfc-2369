@@ -7,7 +7,9 @@ extension RFC_2369.List.Post {
     @Suite
     struct `Edge Case` {
         @Test
-        func `NO with trailing RFC 822 comment parses as noPosting per RFC 2369 section 3.4`() throws {
+        func `NO with trailing RFC 822 comment parses as noPosting per RFC 2369 section 3.4`()
+            throws
+        {
             let post = try RFC_2369.List.Post("NO (posting not allowed on this list)")
             #expect(post == .noPosting)
         }
@@ -27,7 +29,9 @@ extension RFC_2369.List.Post {
         }
 
         @Test
-        func `Lowercase no parses as noPosting matching Header entry point case-insensitivity`() throws {
+        func `Lowercase no parses as noPosting matching Header entry point case-insensitivity`()
+            throws
+        {
             let post = try RFC_2369.List.Post("no")
             #expect(post == .noPosting)
         }

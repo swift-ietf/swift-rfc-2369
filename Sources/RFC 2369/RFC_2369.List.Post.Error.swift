@@ -25,8 +25,10 @@ extension RFC_2369.List.Post.Error {
         switch self {
         case .empty:
             return "List-Post value cannot be empty"
+
         case .invalidIRI(let value):
             return "Invalid IRI in List-Post: '\(value)'"
+
         case .noURIs(let value):
             return "No valid URIs found in List-Post: '\(value)'"
         }
