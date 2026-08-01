@@ -5,8 +5,8 @@ import Testing
 
 @testable import RFC_2369
 
-@Suite
-struct `RFC 2369 List Header Tests` {
+extension RFC_2369.List.Header {
+    @Suite struct Unit {
 
     // MARK: - Basic Initialization
 
@@ -324,5 +324,6 @@ struct `RFC 2369 List Header Tests` {
                 continuation.resume()
             }
         }
+    }
     }
 }
