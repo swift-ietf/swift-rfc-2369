@@ -167,7 +167,7 @@ extension RFC_2369.List.Post: ASCII.Parseable {
     ///
     /// - Parameter bytes: The post value as ASCII bytes
     /// - Throws: `Error` if parsing fails
-    public init<Bytes: Collection>(ascii bytes: Bytes) throws(Error)
+    public init<Bytes: Swift.Collection>(ascii bytes: Bytes) throws(Error)
     where Bytes.Element == Byte {
         // Strip RFC 822 comments — parenthesized, nestable — outside angle
         // brackets, so RFC 2369 §3.4 example forms such as

@@ -331,7 +331,7 @@ extension RFC_2369.List.Header: ASCII.Parseable {
     ///
     /// - Parameter bytes: The header as ASCII bytes
     /// - Throws: `Error` if parsing fails
-    public init<Bytes: Collection>(ascii bytes: Bytes) throws(Error)
+    public init<Bytes: Swift.Collection>(ascii bytes: Bytes) throws(Error)
     where Bytes.Element == Byte {
         let byteArray = Array(bytes)
 
