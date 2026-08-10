@@ -328,7 +328,6 @@ extension RFC_2369.List.Post: Codable {
         case noPosting
     }
 
-    // swiftlint:disable:next no_any_protocol_existential typed_throws_required - exact Decodable protocol requirement signature (stdlib; rule-exemptions protocol-requirement shape)
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let type = try container.decode(PostType.self, forKey: .type)
@@ -343,7 +342,6 @@ extension RFC_2369.List.Post: Codable {
         }
     }
 
-    // swiftlint:disable:next no_any_protocol_existential typed_throws_required - exact Encodable protocol requirement signature (stdlib; rule-exemptions protocol-requirement shape)
     public func encode(to encoder: any Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
