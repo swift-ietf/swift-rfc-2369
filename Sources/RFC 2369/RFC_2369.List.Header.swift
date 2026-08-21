@@ -1,63 +1,23 @@
-// ===----------------------------------------------------------------------===//
-//
-// This source file is part of the swift-rfc-2369 open source project
-//
-// Copyright (c) 2025 Coen ten Thije Boonkkamp
-// Licensed under Apache License v2.0
-//
-// See LICENSE.txt for license information
-//
-// SPDX-License-Identifier: Apache-2.0
-//
-// ===----------------------------------------------------------------------===//
-
 public import ASCII_Serializer_Primitives
 public import Binary_Serializable_Primitives
 public import Parseable_ASCII_Primitives
 
 extension RFC_2369.List {
-    /// Complete set of list management headers as defined in RFC 2369
-    ///
-    /// Per RFC 2369, these headers provide automated mail list management capabilities.
-    /// Each header contains one or more IRIs (typically HTTP(S) or mailto) that email
-    /// clients can use to perform list operations.
-    ///
-    /// ## Example
-    ///
-    /// ```swift
-    /// let headers = try RFC_2369.List.Header(
-    ///     ascii: "List-Help: <https://example.com/help>\r\nList-Post: NO\r\n".utf8
-    /// )
-    /// ```
-    ///
-    /// ## RFC 2369 Section 2: Implementation Notes
-    ///
-    /// > The mailing list header fields are subject to the encoding and character
-    /// > restrictions for mail headers as described in [RFC 822].
-    /// >
-    /// > The contents of the list header fields mostly consist of angle-bracket
-    /// > ('<', '>') enclosed URLs, with internal whitespace being ignored.
-    /// > Multiple URLs in a single header field MUST be separated by commas.
+
     public struct Header: Hashable, Sendable, Codable {
-        /// List-Help: URI pointing to list help information
+
         public let help: RFC_3987.IRI?
 
-        /// List-Unsubscribe: One or more URIs for unsubscribing
         public let unsubscribe: [RFC_3987.IRI]?
 
-        /// List-Subscribe: One or more URIs for subscribing
         public let subscribe: [RFC_3987.IRI]?
 
-        /// List-Post: URI(s) for posting to the list, or .noPosting for announcement lists
         public let post: Post?
 
-        /// List-Owner: One or more URIs for contacting the list owner
         public let owner: [RFC_3987.IRI]?
 
-        /// List-Archive: URI pointing to the list archive
         public let archive: RFC_3987.IRI?
 
-        /// Creates a header WITHOUT validation
         init(
             __unchecked: Void,
             help: RFC_3987.IRI?,
@@ -75,7 +35,6 @@ extension RFC_2369.List {
             self.archive = archive
         }
 
-        /// Creates a new set of list headers
         public init(
             help: RFC_3987.IRI? = nil,
             unsubscribe: [RFC_3987.IRI]? = nil,
@@ -97,20 +56,13 @@ extension RFC_2369.List {
     }
 }
 
-// MARK: - Serializable
-
 extension RFC_2369.List.Header: ASCII.Serializable, Binary.Serializable {
-    /// Own `ASCII.Serializable` verb ([FAM-012]) — the RFC 2369 List header block,
-    /// composing the already-re-cut `RFC_3987.IRI` and `RFC_2369.List.Post` **ASCII**
-    /// verbs directly into the `ASCII.Code` buffer (evergreen same-format composition;
-    /// no byte-detour, no property-reach). The conformer's own field-name labels and
-    /// delimiters are leaf-emitted on the ASCII-code substrate. Output is identical to
-    /// the Binary witness body (`serializeBytes`).
+
     public static func serialize<Buffer: RangeReplaceableCollection>(
         _ value: Self,
         into buffer: inout Buffer
     ) where Buffer.Element == ASCII.Code {
-        // List-Help
+
         if let help = value.help {
             buffer.append(contentsOf: "List-Help".utf8.map { ASCII.Code(unchecked: Byte($0)) })
             buffer.append(ASCII.Code.colon)
@@ -122,7 +74,6 @@ extension RFC_2369.List.Header: ASCII.Serializable, Binary.Serializable {
             buffer.append(ASCII.Code.lf)
         }
 
-        // List-Unsubscribe
         if let unsubscribe = value.unsubscribe, !unsubscribe.isEmpty {
             buffer.append(
                 contentsOf: "List-Unsubscribe".utf8.map { ASCII.Code(unchecked: Byte($0)) }
@@ -142,7 +93,6 @@ extension RFC_2369.List.Header: ASCII.Serializable, Binary.Serializable {
             buffer.append(ASCII.Code.lf)
         }
 
-        // List-Subscribe
         if let subscribe = value.subscribe, !subscribe.isEmpty {
             buffer.append(contentsOf: "List-Subscribe".utf8.map { ASCII.Code(unchecked: Byte($0)) })
             buffer.append(ASCII.Code.colon)
@@ -160,7 +110,6 @@ extension RFC_2369.List.Header: ASCII.Serializable, Binary.Serializable {
             buffer.append(ASCII.Code.lf)
         }
 
-        // List-Post
         if let post = value.post {
             buffer.append(contentsOf: "List-Post".utf8.map { ASCII.Code(unchecked: Byte($0)) })
             buffer.append(ASCII.Code.colon)
@@ -170,7 +119,6 @@ extension RFC_2369.List.Header: ASCII.Serializable, Binary.Serializable {
             buffer.append(ASCII.Code.lf)
         }
 
-        // List-Owner
         if let owner = value.owner, !owner.isEmpty {
             buffer.append(contentsOf: "List-Owner".utf8.map { ASCII.Code(unchecked: Byte($0)) })
             buffer.append(ASCII.Code.colon)
@@ -188,7 +136,6 @@ extension RFC_2369.List.Header: ASCII.Serializable, Binary.Serializable {
             buffer.append(ASCII.Code.lf)
         }
 
-        // List-Archive
         if let archive = value.archive {
             buffer.append(contentsOf: "List-Archive".utf8.map { ASCII.Code(unchecked: Byte($0)) })
             buffer.append(ASCII.Code.colon)
@@ -201,8 +148,6 @@ extension RFC_2369.List.Header: ASCII.Serializable, Binary.Serializable {
         }
     }
 
-    /// Explicit `Binary.Serializable` witness disambiguating the two
-    /// constraint-incomparable `serialize(_:into:)` defaults.
     public static func serialize<Buffer: RangeReplaceableCollection>(
         _ value: Self,
         into buffer: inout Buffer
@@ -210,15 +155,11 @@ extension RFC_2369.List.Header: ASCII.Serializable, Binary.Serializable {
         serializeBytes(value, into: &buffer)
     }
 
-    /// Byte-domain serialization body. Composes the re-cut `RFC_3987.IRI` and
-    /// `RFC_2369.List.Post` **Binary** witnesses (the universal verb resolves to the
-    /// `Byte` witness here — no byte-detour, no property-reach); the conformer's own
-    /// field-name labels and delimiters are leaf-emitted on the byte substrate.
     private static func serializeBytes<Buffer: RangeReplaceableCollection>(
         _ header: Self,
         into buffer: inout Buffer
     ) where Buffer.Element == Byte {
-        // List-Help
+
         if let help = header.help {
             buffer.append(contentsOf: [Byte]("List-Help".utf8))
             buffer.append(ASCII.Code.colon)
@@ -230,7 +171,6 @@ extension RFC_2369.List.Header: ASCII.Serializable, Binary.Serializable {
             buffer.append(ASCII.Code.lf)
         }
 
-        // List-Unsubscribe
         if let unsubscribe = header.unsubscribe, !unsubscribe.isEmpty {
             buffer.append(contentsOf: [Byte]("List-Unsubscribe".utf8))
             buffer.append(ASCII.Code.colon)
@@ -248,7 +188,6 @@ extension RFC_2369.List.Header: ASCII.Serializable, Binary.Serializable {
             buffer.append(ASCII.Code.lf)
         }
 
-        // List-Subscribe
         if let subscribe = header.subscribe, !subscribe.isEmpty {
             buffer.append(contentsOf: [Byte]("List-Subscribe".utf8))
             buffer.append(ASCII.Code.colon)
@@ -266,7 +205,6 @@ extension RFC_2369.List.Header: ASCII.Serializable, Binary.Serializable {
             buffer.append(ASCII.Code.lf)
         }
 
-        // List-Post
         if let post = header.post {
             buffer.append(contentsOf: [Byte]("List-Post".utf8))
             buffer.append(ASCII.Code.colon)
@@ -276,7 +214,6 @@ extension RFC_2369.List.Header: ASCII.Serializable, Binary.Serializable {
             buffer.append(ASCII.Code.lf)
         }
 
-        // List-Owner
         if let owner = header.owner, !owner.isEmpty {
             buffer.append(contentsOf: [Byte]("List-Owner".utf8))
             buffer.append(ASCII.Code.colon)
@@ -294,7 +231,6 @@ extension RFC_2369.List.Header: ASCII.Serializable, Binary.Serializable {
             buffer.append(ASCII.Code.lf)
         }
 
-        // List-Archive
         if let archive = header.archive {
             buffer.append(contentsOf: [Byte]("List-Archive".utf8))
             buffer.append(ASCII.Code.colon)
@@ -308,34 +244,16 @@ extension RFC_2369.List.Header: ASCII.Serializable, Binary.Serializable {
     }
 }
 
-// MARK: - Parseable
-
 extension RFC_2369.List.Header: ASCII.Parseable {
-    /// Creates a list header block by validating `string`'s UTF-8 bytes.
+
     public init(_ string: some StringProtocol) throws(Error) {
         try self.init(ascii: [Byte](string.utf8))
     }
 
-    /// Parses list headers from ASCII bytes (AUTHORITATIVE IMPLEMENTATION)
-    ///
-    /// ## RFC 2369 Section 2
-    ///
-    /// > The contents of the list header fields mostly consist of angle-bracket
-    /// > ('<', '>') enclosed URLs, with internal whitespace being ignored.
-    ///
-    /// ## Category Theory
-    ///
-    /// Parsing transformation:
-    /// - **Domain**: [UInt8] (ASCII bytes)
-    /// - **Codomain**: RFC_2369.List.Header (structured data)
-    ///
-    /// - Parameter bytes: The header as ASCII bytes
-    /// - Throws: `Error` if parsing fails
     public init<Bytes: Swift.Collection>(ascii bytes: Bytes) throws(Error)
     where Bytes.Element == Byte {
         let byteArray = Array(bytes)
 
-        // Helper to trim whitespace
         func trimWhitespace(_ arr: [Byte]) -> [Byte] {
             var result = arr
             while let firstByte = result.first {
@@ -361,7 +279,6 @@ extension RFC_2369.List.Header: ASCII.Parseable {
             return result
         }
 
-        // Helper to extract IRIs from angle-bracketed, comma-separated list
         func parseIRIs(_ value: [Byte]) -> [RFC_3987.IRI] {
             var iris: [RFC_3987.IRI] = []
             var current: [Byte] = []
@@ -385,8 +302,7 @@ extension RFC_2369.List.Header: ASCII.Parseable {
                             let iri = try RFC_3987.IRI(iriString)
                             iris.append(iri)
                         } catch {
-                            // Invalid IRI in a header value is skipped, not fatal —
-                            // matches the prior `try?`-and-discard behavior.
+
                         }
                     }
                 } else if inBrackets {
@@ -396,8 +312,6 @@ extension RFC_2369.List.Header: ASCII.Parseable {
             return iris
         }
 
-        // Split into physical lines (CRLF, lone CR, or lone LF terminated),
-        // preserving empty lines so folding boundaries are visible.
         var physicalLines: [[Byte]] = []
         var currentLine: [Byte] = []
         var previousWasCR = false
@@ -410,7 +324,7 @@ extension RFC_2369.List.Header: ASCII.Parseable {
             }
             if code == ASCII.Code.lf {
                 if previousWasCR {
-                    // Second half of a CRLF pair — the line already ended at CR.
+
                     previousWasCR = false
                     continue
                 }
@@ -429,9 +343,6 @@ extension RFC_2369.List.Header: ASCII.Parseable {
             physicalLines.append(currentLine)
         }
 
-        // Unfold per RFC 822 §3.1.1 / RFC 5322 §2.2.3: a line break followed by
-        // SP/HTAB continues the previous field. A blank line ends folding — a
-        // whitespace-led line after it does not join the earlier field.
         var lines: [[Byte]] = []
         var previousPhysicalLineWasNonEmpty = false
         for line in physicalLines {
@@ -492,9 +403,7 @@ extension RFC_2369.List.Header: ASCII.Parseable {
                 subscribe = iris.isEmpty ? nil : iris
 
             case "list-post":
-                // Delegate to the single authoritative List-Post value parser so
-                // both entry points classify the RFC 2369 §3.4 example forms
-                // (including RFC 822 comments) identically.
+
                 do throws(RFC_2369.List.Post.Error) {
                     post = try RFC_2369.List.Post(ascii: fieldValueBytes)
                 } catch {
@@ -526,13 +435,9 @@ extension RFC_2369.List.Header: ASCII.Parseable {
     }
 }
 
-// MARK: - Protocol Conformances
-
 extension RFC_2369.List.Header: Swift.RawRepresentable {
     public typealias RawValue = String
 
-    /// The header block's ASCII serialization as a `String` (computed; the
-    /// rawValue is derived from serialization, not stored).
     public var rawValue: String {
         String(decoding: serialized.underlying, as: UTF8.self)
     }
@@ -552,12 +457,8 @@ extension RFC_2369.List.Header: CustomStringConvertible {
     }
 }
 
-// MARK: - Email Header Rendering
-
 extension [String: String] {
-    /// Creates email header dictionary from RFC 2369 list headers
-    ///
-    /// - Parameter listHeader: The RFC 2369 list header to render
+
     public init(listHeader: RFC_2369.List.Header) {
         var headers: [String: String] = [:]
 

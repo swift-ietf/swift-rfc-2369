@@ -8,7 +8,7 @@ struct `README Verification` {
 
     @Test
     func `Example from README: Creating List Headers`() {
-        // From README line 41-52
+
         let headers = RFC_2369.List.Header(
             help: RFC_3987.IRI("https://example.com/help"),
             unsubscribe: [
@@ -31,7 +31,6 @@ struct `README Verification` {
             help: RFC_3987.IRI("https://example.com/help")
         )
 
-        // From README line 68
         let emailHeaders = [String: String](listHeader: headers)
 
         #expect(emailHeaders["List-Help"] == "<https://example.com/help>")
@@ -39,10 +38,10 @@ struct `README Verification` {
 
     @Test
     func `Example from README: Announcement-Only Lists`() {
-        // From README line 82-87
+
         let headers = RFC_2369.List.Header(
             help: RFC_3987.IRI("https://example.com/help"),
-            post: .noPosting  // Renders as "List-Post: NO"
+            post: .noPosting
         )
 
         let emailHeaders = [String: String](listHeader: headers)

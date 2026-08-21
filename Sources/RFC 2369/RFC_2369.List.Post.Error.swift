@@ -1,18 +1,5 @@
-// ===----------------------------------------------------------------------===//
-//
-// This source file is part of the swift-rfc-2369 open source project
-//
-// Copyright (c) 2025 Coen ten Thije Boonkkamp
-// Licensed under Apache License v2.0
-//
-// See LICENSE.txt for license information
-//
-// SPDX-License-Identifier: Apache-2.0
-//
-// ===----------------------------------------------------------------------===//
-
 extension RFC_2369.List.Post {
-    /// Errors during List-Post value parsing
+
     public enum Error: Swift.Error, Sendable, Equatable, CustomStringConvertible {
         case empty
         case invalidIRI(_ value: String)

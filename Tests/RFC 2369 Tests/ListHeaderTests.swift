@@ -8,8 +8,6 @@ import Testing
 extension RFC_2369.List.Header {
     @Suite struct Unit {
 
-        // MARK: - Basic Initialization
-
         @Test
         func `List headers can be created with all fields`() {
             let headers = RFC_2369.List.Header(
@@ -45,8 +43,6 @@ extension RFC_2369.List.Header {
             #expect(headers.archive == nil)
         }
 
-        // MARK: - Email Header Rendering
-
         @Test
         func `Renders single URI headers correctly per RFC 2369`() {
             let headers = RFC_2369.List.Header(
@@ -75,7 +71,6 @@ extension RFC_2369.List.Header {
 
             let emailHeaders = [String: String](listHeader: headers)
 
-            // Per RFC 2369: Multiple URLs MUST be separated by commas
             #expect(
                 emailHeaders["List-Unsubscribe"]
                     == "<https://example.com/unsubscribe>, <mailto:unsubscribe@example.com?subject=unsubscribe>"
@@ -107,7 +102,6 @@ extension RFC_2369.List.Header {
 
             let emailHeaders = [String: String](listHeader: headers)
 
-            // Per RFC 2369 Section 3.4: "NO" indicates posting not allowed
             #expect(emailHeaders["List-Post"] == "NO")
         }
 
@@ -128,16 +122,8 @@ extension RFC_2369.List.Header {
             #expect(emailHeaders["List-Archive"] == nil)
         }
 
-        // MARK: - RFC 2369 Examples
-
         @Test
         func `Example from RFC 2369 Section 4.1`() {
-            // RFC 2369 Example:
-            // List-Help: <mailto:list@host.com?subject=help> (List Instructions)
-            // List-Unsubscribe: <mailto:list@host.com?subject=unsubscribe>
-            // List-Subscribe: <mailto:list@host.com?subject=subscribe>
-            // List-Post: <mailto:list@host.com>
-            // List-Owner: <mailto:listmom@host.com> (Contact Person for Help)
 
             let headers = RFC_2369.List.Header(
                 help: RFC_3987.IRI("mailto:list@host.com?subject=help"),
@@ -160,10 +146,6 @@ extension RFC_2369.List.Header {
 
         @Test
         func `Example from RFC 2369 Section 4.2 - Web-based list`() {
-            // RFC 2369 Example: Web-based mailing list
-            // List-Help: <http://www.host.com/list/> <mailto:list-help@host.com>
-            // List-Unsubscribe: <http://www.host.com/list.cgi?cmd=unsub&lst=list>, <mailto:list-request@host.com?subject=unsubscribe>
-            // List-Post: <mailto:list@host.com>
 
             let headers = RFC_2369.List.Header(
                 help: RFC_3987.IRI("http://www.host.com/list/"),
@@ -191,9 +173,6 @@ extension RFC_2369.List.Header {
 
         @Test
         func `Example from RFC 2369 Section 4.3 - Announcement-only list`() {
-            // RFC 2369 Example: Announcement-only list
-            // List-Help: <mailto:list-info@host.com>
-            // List-Post: NO (posting not allowed on this list)
 
             let headers = RFC_2369.List.Header(
                 help: RFC_3987.IRI("mailto:list-info@host.com"),
@@ -205,8 +184,6 @@ extension RFC_2369.List.Header {
             #expect(emailHeaders["List-Help"] == "<mailto:list-info@host.com>")
             #expect(emailHeaders["List-Post"] == "NO")
         }
-
-        // MARK: - List.Post Tests
 
         @Test
         func `List.Post.uris renders correctly`() {
@@ -228,8 +205,6 @@ extension RFC_2369.List.Header {
 
             #expect(headerValue == "NO")
         }
-
-        // MARK: - Byte Serialization Tests
 
         @Test
         func `List.Header serializes to bytes correctly`() {
@@ -255,8 +230,6 @@ extension RFC_2369.List.Header {
             let uriBytes = [Byte](uris)
             #expect(uriBytes == [Byte]("<mailto:list@example.com>".utf8))
         }
-
-        // MARK: - Codable Tests
 
         @Test
         func `List.Header is Codable`() throws {
@@ -287,8 +260,6 @@ extension RFC_2369.List.Header {
             #expect(decodedNo == noPost)
         }
 
-        // MARK: - Hashable Tests
-
         @Test
         func `List.Header is Hashable`() {
             let header1 = RFC_2369.List.Header(
@@ -312,8 +283,6 @@ extension RFC_2369.List.Header {
             #expect(set.count == 2)
         }
 
-        // MARK: - Sendable Tests
-
         @Test
         func `List.Header is Sendable`() async {
             let headers = RFC_2369.List.Header(
@@ -322,7 +291,7 @@ extension RFC_2369.List.Header {
 
             await withCheckedContinuation { continuation in
                 Task {
-                    let _ = headers  // Can use in async context
+                    let _ = headers
                     continuation.resume()
                 }
             }
