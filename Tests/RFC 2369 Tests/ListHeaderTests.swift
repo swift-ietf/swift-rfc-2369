@@ -1,4 +1,4 @@
-import Binary_Serializable_Primitives
+import Binary_Serializable
 import Foundation
 import RFC_3987
 import Testing

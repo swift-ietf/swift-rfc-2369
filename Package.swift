@@ -18,12 +18,12 @@ let package = Package(
     ],
     dependencies: [
         .package(
-            url: "https://github.com/swift-primitives/swift-ascii-serializer-primitives.git",
+            url: "https://github.com/swift-molecules/swift-ascii-serializer.git",
             branch: "main"
         ),
         .package(url: "https://github.com/swift-ietf/swift-rfc-3987.git", branch: "main"),
         .package(
-            url: "https://github.com/swift-primitives/swift-parser-primitives.git",
+            url: "https://github.com/swift-molecules/swift-parser.git",
             branch: "main"
         ),
     ],
@@ -32,11 +32,11 @@ let package = Package(
             name: "RFC 2369",
             dependencies: [
                 .product(
-                    name: "ASCII Serializer Primitives",
-                    package: "swift-ascii-serializer-primitives"
+                    name: "ASCII Serializer",
+                    package: "swift-ascii-serializer"
                 ),
                 .product(name: "RFC 3987", package: "swift-rfc-3987"),
-                .product(name: "Parser Primitives", package: "swift-parser-primitives"),
+                .product(name: "Parser", package: "swift-parser"),
             ]
         ),
         .testTarget(
