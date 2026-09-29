@@ -224,11 +224,11 @@ extension RFC_2369.List.Header {
         func `List.Post serializes to bytes correctly`() {
             let noPosting = RFC_2369.List.Post.noPosting
             let noBytes = [Byte](noPosting)
-            #expect(noBytes == [Byte]("NO".utf8))
+            #expect(noBytes == [Byte](utf8: "NO"))
 
             let uris = RFC_2369.List.Post.uris([RFC_3987.IRI("mailto:list@example.com")])
             let uriBytes = [Byte](uris)
-            #expect(uriBytes == [Byte]("<mailto:list@example.com>".utf8))
+            #expect(uriBytes == [Byte](utf8: "<mailto:list@example.com>"))
         }
 
         @Test

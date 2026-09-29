@@ -48,18 +48,18 @@ extension RFC_2369.List.Post: ASCII.Serializable, Binary.Serializable {
     ) where Buffer.Element == Byte {
         switch post {
         case .noPosting:
-            buffer.append(ASCII.Code.N)
-            buffer.append(ASCII.Code.O)
+            buffer.append(ASCII.Code.N.byte)
+            buffer.append(ASCII.Code.O.byte)
 
         case .uris(let iris):
             for (index, iri) in iris.enumerated() {
                 if index > 0 {
-                    buffer.append(ASCII.Code.comma)
-                    buffer.append(ASCII.Code.space)
+                    buffer.append(ASCII.Code.comma.byte)
+                    buffer.append(ASCII.Code.space.byte)
                 }
-                buffer.append(ASCII.Code.lessThanSign)
+                buffer.append(ASCII.Code.lessThanSign.byte)
                 RFC_3987.IRI.serialize(iri, into: &buffer)
-                buffer.append(ASCII.Code.greaterThanSign)
+                buffer.append(ASCII.Code.greaterThanSign.byte)
             }
         }
     }
@@ -68,7 +68,7 @@ extension RFC_2369.List.Post: ASCII.Serializable, Binary.Serializable {
 extension RFC_2369.List.Post: ASCII.Parseable {
 
     public init(_ string: some StringProtocol) throws(Error) {
-        try self.init(ascii: [Byte](string.utf8))
+        try self.init(ascii: string.utf8.map(Byte.init(bitPattern:)))
     }
 
     public init<Bytes: Swift.Collection>(ascii bytes: Bytes) throws(Error)
@@ -188,7 +188,7 @@ extension RFC_2369.List.Post: Swift.RawRepresentable {
     public typealias RawValue = String
 
     public var rawValue: String {
-        String(decoding: serialized.underlying, as: UTF8.self)
+        String(decoding: serialized, as: UTF8.self)
     }
 
     public init?(rawValue: String) {
@@ -203,7 +203,7 @@ extension RFC_2369.List.Post: Swift.RawRepresentable {
 extension RFC_2369.List.Post: CustomStringConvertible {
 
     public var description: String {
-        String(decoding: serialized.underlying, as: UTF8.self)
+        String(decoding: serialized, as: UTF8.self)
     }
 }
 
