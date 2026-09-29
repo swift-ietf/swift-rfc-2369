@@ -1,4 +1,4 @@
-import Binary_Serializable
+import Binary
 import Foundation
 import RFC_3987
 import Testing
