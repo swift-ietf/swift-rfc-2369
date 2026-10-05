@@ -19,6 +19,12 @@ extension RFC_2369.List.Header.Parse {
 }
 
 extension RFC_2369.List.Header.Parse: Parsing {
+    public var body: Never {
+        borrowing get {
+            return fatalError("\(Self.self) is a leaf: implement its conformance requirements directly")
+        }
+    }
+
     public typealias Failure = RFC_2369.List.Header.Parse<Input>.Error
 
     @inlinable
