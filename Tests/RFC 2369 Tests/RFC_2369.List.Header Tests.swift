@@ -24,7 +24,7 @@ extension RFC_2369.List.Header {
             let header = try RFC_2369.List.Header(
                 "List-Post: <mailto:moderator@host.com> (Postings are Moderated)\r\n"
             )
-            #expect(header.post == .uris([try RFC_3987.IRI("mailto:moderator@host.com")]))
+            #expect(header.post == .uris([RFC_3987.IRI("mailto:moderator@host.com")]))
         }
 
         @Test
@@ -36,7 +36,7 @@ extension RFC_2369.List.Header {
             )
             #expect(header.unsubscribe?.count == 2)
             #expect(
-                header.unsubscribe?.last == (try RFC_3987.IRI("mailto:unsubscribe-b@example.com"))
+                header.unsubscribe?.last == RFC_3987.IRI("mailto:unsubscribe-b@example.com")
             )
         }
 
@@ -45,7 +45,7 @@ extension RFC_2369.List.Header {
             let header = try RFC_2369.List.Header(
                 "List-Help: <ftp://ftp.host.com/list.txt> (FTP),\r\n\t<mailto:list@host.com?subject=help>\r\n"
             )
-            #expect(header.help == (try RFC_3987.IRI("ftp://ftp.host.com/list.txt")))
+            #expect(header.help == RFC_3987.IRI("ftp://ftp.host.com/list.txt"))
         }
 
         @Test
@@ -53,7 +53,7 @@ extension RFC_2369.List.Header {
             let header = try RFC_2369.List.Header(
                 "List-Archive:\r\n <https://example.com/archive>\r\n"
             )
-            #expect(header.archive == (try RFC_3987.IRI("https://example.com/archive")))
+            #expect(header.archive == RFC_3987.IRI("https://example.com/archive"))
         }
 
         @Test
@@ -62,7 +62,7 @@ extension RFC_2369.List.Header {
             let header = try RFC_2369.List.Header(
                 "List-Help: <https://example.com/help>\r\n\r\n <https://example.com/other>\r\n"
             )
-            #expect(header.help == (try RFC_3987.IRI("https://example.com/help")))
+            #expect(header.help == RFC_3987.IRI("https://example.com/help"))
         }
     }
 }

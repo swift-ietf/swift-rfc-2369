@@ -71,7 +71,7 @@ extension RFC_2369.List.Post: ASCII.Parseable {
         try self.init(ascii: string.utf8.map(Byte.init(bitPattern:)))
     }
 
-    public init<Bytes: Swift.Collection>(ascii bytes: Bytes) throws(Error)
+    public init<Bytes: Swift::Collection>(ascii bytes: Bytes) throws(Error)
     where Bytes.Element == Byte {
 
         var byteArray: [Byte] = []
@@ -184,7 +184,7 @@ extension RFC_2369.List.Post: ASCII.Parseable {
     }
 }
 
-extension RFC_2369.List.Post: Swift.RawRepresentable {
+extension RFC_2369.List.Post: Swift::RawRepresentable {
     public typealias RawValue = String
 
     public var rawValue: String {

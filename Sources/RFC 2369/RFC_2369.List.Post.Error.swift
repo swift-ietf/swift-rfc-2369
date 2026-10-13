@@ -1,6 +1,6 @@
 extension RFC_2369.List.Post {
 
-    public enum Error: Swift.Error, Sendable, Equatable, CustomStringConvertible {
+    public enum Error: Swift::Error, Sendable, Equatable, CustomStringConvertible {
         case empty
         case invalidIRI(_ value: String)
         case noURIs(_ value: String)

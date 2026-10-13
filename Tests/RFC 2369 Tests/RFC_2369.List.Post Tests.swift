@@ -19,7 +19,7 @@ extension RFC_2369.List.Post {
             let post = try RFC_2369.List.Post(
                 "<mailto:moderator@host.com> (Postings are Moderated)"
             )
-            #expect(post == .uris([try RFC_3987.IRI("mailto:moderator@host.com")]))
+            #expect(post == .uris([RFC_3987.IRI("mailto:moderator@host.com")]))
         }
 
         @Test
@@ -39,7 +39,7 @@ extension RFC_2369.List.Post {
         @Test
         func `Parenthesis inside angle brackets is preserved as IRI content`() throws {
             let post = try RFC_2369.List.Post("<mailto:list@host.com?subject=a(b)>")
-            #expect(post == .uris([try RFC_3987.IRI("mailto:list@host.com?subject=a(b)")]))
+            #expect(post == .uris([RFC_3987.IRI("mailto:list@host.com?subject=a(b)")]))
         }
     }
 }

@@ -249,7 +249,7 @@ extension RFC_2369.List.Header: ASCII.Parseable {
         try self.init(ascii: string.utf8.map(Byte.init(bitPattern:)))
     }
 
-    public init<Bytes: Swift.Collection>(ascii bytes: Bytes) throws(Error)
+    public init<Bytes: Swift::Collection>(ascii bytes: Bytes) throws(Error)
     where Bytes.Element == Byte {
         let byteArray = Array(bytes)
 
@@ -434,7 +434,7 @@ extension RFC_2369.List.Header: ASCII.Parseable {
     }
 }
 
-extension RFC_2369.List.Header: Swift.RawRepresentable {
+extension RFC_2369.List.Header: Swift::RawRepresentable {
     public typealias RawValue = String
 
     public var rawValue: String {

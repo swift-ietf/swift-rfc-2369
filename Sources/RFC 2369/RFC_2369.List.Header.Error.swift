@@ -1,6 +1,6 @@
 extension RFC_2369.List.Header {
 
-    public enum Error: Swift.Error, Sendable, Equatable, CustomStringConvertible {
+    public enum Error: Swift::Error, Sendable, Equatable, CustomStringConvertible {
         case invalidIRI(_ value: String)
     }
 }

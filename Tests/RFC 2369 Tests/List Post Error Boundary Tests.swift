@@ -17,12 +17,12 @@ struct `List-Post error boundaries` {
     @Test
     func `nested comments are skipped before the URI`() throws {
         let post = try RFC_2369.List.Post("((nested) comment) <mailto:list@host.com>")
-        #expect(post == .uris([try RFC_3987.IRI("mailto:list@host.com")]))
+        #expect(post == .uris([RFC_3987.IRI("mailto:list@host.com")]))
     }
 
     @Test
     func `several URIs keep their order`() throws {
         let post = try RFC_2369.List.Post("<mailto:a@host.com>, <https://host.com/post>")
-        #expect(post == .uris([try RFC_3987.IRI("mailto:a@host.com"), try RFC_3987.IRI("https://host.com/post")]))
+        #expect(post == .uris([RFC_3987.IRI("mailto:a@host.com"), RFC_3987.IRI("https://host.com/post")]))
     }
 }
