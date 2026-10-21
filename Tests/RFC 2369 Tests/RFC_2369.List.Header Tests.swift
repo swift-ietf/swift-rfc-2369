@@ -57,8 +57,7 @@ extension RFC_2369.List.Header {
         }
 
         @Test
-        func `Whitespace-led line after a blank line does not fold into the previous field`() throws
-        {
+        func `Whitespace-led line after a blank line does not fold into the previous field`() throws {
             let header = try RFC_2369.List.Header(
                 "List-Help: <https://example.com/help>\r\n\r\n <https://example.com/other>\r\n"
             )
