@@ -3,7 +3,9 @@ import Testing
 
 @testable import RFC_2369
 
-extension RFC_2369.List.Post {
+enum `RFC_2369.List.Post Tests` {}
+
+extension `RFC_2369.List.Post Tests` {
     @Suite
     struct `Edge Case` {
         @Test

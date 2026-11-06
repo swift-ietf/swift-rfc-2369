@@ -3,7 +3,7 @@ import Testing
 
 @testable import RFC_2369
 
-extension RFC_2369.List.Header {
+extension `RFC_2369.List.Header Tests` {
     @Suite
     struct `Edge Case` {
         @Test

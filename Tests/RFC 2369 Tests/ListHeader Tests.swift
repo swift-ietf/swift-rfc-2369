@@ -5,7 +5,9 @@ import Testing
 
 @testable import RFC_2369
 
-extension RFC_2369.List.Header {
+enum `RFC_2369.List.Header Tests` {}
+
+extension `RFC_2369.List.Header Tests` {
     @Suite struct Unit {
 
         @Test
