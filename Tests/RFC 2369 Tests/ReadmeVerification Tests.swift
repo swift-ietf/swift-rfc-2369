@@ -3,48 +3,52 @@ import Testing
 
 @testable import RFC_2369
 
-@Suite
-struct `README Verification` {
+enum `ReadmeVerification Tests` {}
 
-    @Test
-    func `Example from README: Creating List Headers`() {
+extension `ReadmeVerification Tests` {
+    @Suite
+    struct `README Verification` {
 
-        let headers = RFC_2369.List.Header(
-            help: RFC_3987.IRI("https://example.com/help"),
-            unsubscribe: [
-                RFC_3987.IRI("https://example.com/unsubscribe"),
-                RFC_3987.IRI("mailto:unsubscribe@example.com"),
-            ],
-            subscribe: [RFC_3987.IRI("https://example.com/subscribe")],
-            post: .uris([RFC_3987.IRI("mailto:list@example.com")]),
-            owner: [RFC_3987.IRI("mailto:owner@example.com")],
-            archive: RFC_3987.IRI("https://example.com/archive")
-        )
+        @Test
+        func `Example from README: Creating List Headers`() {
 
-        #expect(headers.help != nil)
-        #expect(headers.unsubscribe?.count == 2)
-    }
+            let headers = RFC_2369.List.Header(
+                help: RFC_3987.IRI("https://example.com/help"),
+                unsubscribe: [
+                    RFC_3987.IRI("https://example.com/unsubscribe"),
+                    RFC_3987.IRI("mailto:unsubscribe@example.com"),
+                ],
+                subscribe: [RFC_3987.IRI("https://example.com/subscribe")],
+                post: .uris([RFC_3987.IRI("mailto:list@example.com")]),
+                owner: [RFC_3987.IRI("mailto:owner@example.com")],
+                archive: RFC_3987.IRI("https://example.com/archive")
+            )
 
-    @Test
-    func `Example from README: Rendering as Email Headers`() {
-        let headers = RFC_2369.List.Header(
-            help: RFC_3987.IRI("https://example.com/help")
-        )
+            #expect(headers.help != nil)
+            #expect(headers.unsubscribe?.count == 2)
+        }
 
-        let emailHeaders = [String: String](listHeader: headers)
+        @Test
+        func `Example from README: Rendering as Email Headers`() {
+            let headers = RFC_2369.List.Header(
+                help: RFC_3987.IRI("https://example.com/help")
+            )
 
-        #expect(emailHeaders["List-Help"] == "<https://example.com/help>")
-    }
+            let emailHeaders = [String: String](listHeader: headers)
 
-    @Test
-    func `Example from README: Announcement-Only Lists`() {
+            #expect(emailHeaders["List-Help"] == "<https://example.com/help>")
+        }
 
-        let headers = RFC_2369.List.Header(
-            help: RFC_3987.IRI("https://example.com/help"),
-            post: .noPosting
-        )
+        @Test
+        func `Example from README: Announcement-Only Lists`() {
 
-        let emailHeaders = [String: String](listHeader: headers)
-        #expect(emailHeaders["List-Post"] == "NO")
+            let headers = RFC_2369.List.Header(
+                help: RFC_3987.IRI("https://example.com/help"),
+                post: .noPosting
+            )
+
+            let emailHeaders = [String: String](listHeader: headers)
+            #expect(emailHeaders["List-Post"] == "NO")
+        }
     }
 }
