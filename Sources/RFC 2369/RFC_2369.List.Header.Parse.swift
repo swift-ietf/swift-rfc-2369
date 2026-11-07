@@ -12,10 +12,6 @@ extension RFC_2369.List.Header {
 extension RFC_2369.List.Header.Parse {
     public typealias Output = [Input]
 
-    public enum Error: Swift::Error, Sendable, Equatable {
-        case expectedOpenAngle
-        case unterminatedURI
-    }
 }
 
 extension RFC_2369.List.Header.Parse: Parsing {
